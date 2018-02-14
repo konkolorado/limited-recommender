@@ -5,6 +5,11 @@ Removes lines in the dataset that: contain null values, has incomplete
 data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
+
+TODO
+- make sure i'm lowercasing all Locations
+- remove extraneous quote marks from the data
+- remove white space from between the location info
 """
 import os
 
@@ -31,6 +36,8 @@ def clean_users():
                 continue
             if get_line_age(line) > MAX_AGE or get_line_age(line) < MIN_AGE:
                 continue
+
+            #line = process_data(line)
             line.encode("utf8")
             destf.write(line)
 
@@ -50,7 +57,25 @@ def missing_location_data(line):
 def get_line_age(line):
     return int(line.strip().split(";")[-1].strip("\""))
 
-def clean_location_interactive():
+def process_data(line):
+    """
+    Modifies the data in the line to be: all lowercase, stripped
+    of extra quotation chars, and stripped of leading and internal
+    whitespace. Returns the new line
+    """
+    line = lowercase(line)
+    line = strip_quotes(line)
+    line = strip_whitespace(line)
+    return line
+
+def lowercase(line):
+
+    #new_line = line.split(";")
+    #print(new_line)
+    #result = line.split(";")[1].split(",")
+
+
+def clean_locations_interactive():
     """
     Cleaning the city, state, country data is hard to do without
     human input. Here we collect the number of times the city, state,
@@ -68,12 +93,19 @@ def clean_location_interactive():
 
         for line in srcf:
             *_, country = extract_city_state_country(line)
-            if country_counts[country] < 5:
-                print(f"Country Counts {country}: {country_counts[country]}")
-                if keep_line():
-                    #TODO
-                    # Allow user to manually rewrite the country
+            if country_counts[country] < COUNT_THRESH:
+                print(f"Country Counts '{country}': {country_counts[country]}")
+
+                choice = user_menu()
+                if choice == "Y":
                     destf.write(line)
+                if choice == "M":
+                    print(line)
+                    line = update_line(line)
+                    print(line)
+                    destf.write(line)
+                else:
+                    continue # Reject line
             else:
                 destf.write(line)
         remove_tempfile()
@@ -93,22 +125,33 @@ def collect_country_frequency(filename):
 
 def extract_city_state_country(line):
     result = line.split(";")[1].split(",")
-    return [loc.lower().strip() for loc in result]
+    return [loc.lower().strip(" \"") for loc in result]
 
-def keep_line():
+def user_menu():
     while True:
-        result = input("Accept? [Y/n]: ")
-        if result == "Y":
-            return True
-        if result == "n":
-            return False
+        result = input("Accept? Reject? Modify? [Y/R/M]: ")
+        if result == "Y" or result == "R" or result == "M":
+            return result
+
+def update_line(line):
+    country = input("New country: ")
+    line = update_country_in_line(country, line)
+    return line
+
+def update_country_in_line(new_country, line):
+    new_line = line.split(";")
+    location_data = new_line[1].split(",")
+    location_data[2] = new_country
+    new_line[1] = ','.join(location_data)
+    new_line = ';'.join(new_line)
+    return new_line
 
 def remove_tempfile():
     os.remove("BX-Users-TempFile.csv")
 
 def main():
     clean_users()
-    clean_location_interactive()
+    clean_locations_interactive()
 
 if __name__ == '__main__':
     main()
