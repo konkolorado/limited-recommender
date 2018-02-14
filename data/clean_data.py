@@ -5,11 +5,6 @@ Removes lines in the dataset that: contain null values, has incomplete
 data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
-
-TODO
-- make sure i'm lowercasing all Locations
-- remove extraneous quote marks from the data
-- remove white space from between the location info
 """
 import os
 
@@ -37,7 +32,7 @@ def clean_users():
             if get_line_age(line) > MAX_AGE or get_line_age(line) < MIN_AGE:
                 continue
 
-            #line = process_data(line)
+            line = process_data(line)
             line.encode("utf8")
             destf.write(line)
 
@@ -60,8 +55,8 @@ def get_line_age(line):
 def process_data(line):
     """
     Modifies the data in the line to be: all lowercase, stripped
-    of extra quotation chars, and stripped of leading and internal
-    whitespace. Returns the new line
+    of extra quotation chars, and stripped of internal whitespace.
+    Returns the new line
     """
     line = lowercase(line)
     line = strip_quotes(line)
@@ -69,11 +64,22 @@ def process_data(line):
     return line
 
 def lowercase(line):
+    new_line = line.split(';')
+    new_line[1] = new_line[1].lower()
+    return ';'.join(new_line)
 
-    #new_line = line.split(";")
-    #print(new_line)
-    #result = line.split(";")[1].split(",")
+def strip_quotes(line):
+    new_line = line.split(';')
+    new_line = [info.strip('\"') for info in new_line]
+    new_line[-1] = new_line[-1].replace("\"", "")
+    return ';'.join(new_line)
 
+def strip_whitespace(line):
+    new_line = line.split(';')
+    location = new_line[1].split(",")
+    location = [data.strip() for data in location]
+    new_line[1] = ','.join(location)
+    return ';'.join(new_line)
 
 def clean_locations_interactive():
     """
@@ -97,12 +103,12 @@ def clean_locations_interactive():
                 print(f"Country Counts '{country}': {country_counts[country]}")
 
                 choice = user_menu()
-                if choice == "Y":
+                if choice == "A":
+                    # Do this to remember this entry is ok
+                    country_counts[country] = COUNT_THRESH
                     destf.write(line)
                 if choice == "M":
-                    print(line)
                     line = update_line(line)
-                    print(line)
                     destf.write(line)
                 else:
                     continue # Reject line
@@ -124,17 +130,16 @@ def collect_country_frequency(filename):
     return country_counts
 
 def extract_city_state_country(line):
-    result = line.split(";")[1].split(",")
-    return [loc.lower().strip(" \"") for loc in result]
+    return line.split(";")[1].split(",")
 
 def user_menu():
     while True:
-        result = input("Accept? Reject? Modify? [Y/R/M]: ")
-        if result == "Y" or result == "R" or result == "M":
+        result = input("Accept? Reject? Modify? [A/R/M]: ")
+        if result == "A" or result == "R" or result == "M":
             return result
 
 def update_line(line):
-    country = input("New country: ")
+    country = input("New country: ").lower().strip("\" ")
     line = update_country_in_line(country, line)
     return line
 
