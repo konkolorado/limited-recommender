@@ -115,9 +115,7 @@ def clean_locations_interactive():
                     destf.write(line)
                 if choice == "M":
                     recs = get_recommendations(corpus, country)
-                    s = build_recs_message(recs)
-                    print(f"Suggestions: {s}")
-                    line = update_line(line)
+                    line = update_line(line, recs)
                     destf.write(line)
                 else:
                     continue # Reject line
@@ -147,10 +145,33 @@ def user_menu():
         if result == "A" or result == "R" or result == "M":
             return result
 
-def update_line(line):
-    country = input("New country: ").lower().strip("\" ")
+def update_line(line, recs):
+    message = build_recs_message(recs)
+    country = get_updated_country(message, len(recs))
     line = update_country_in_line(country, line)
     return line
+
+def get_updated_country(rec_message, rec_len):
+    """
+    Gets user input to update country name while presenting options
+    previously encountered in the data..
+    Requirements: Name must be greater than 1 char
+    Returns the users input
+    """
+    while True:
+        print(f"Suggestions: {rec_message}")
+        country = input("New country: ").lower().strip("\" ")
+        try:
+            choice = int(country) - 1
+            if choice > -1 and choice < rec_len:
+                country = recs[choice]
+            else:
+                country = ""
+        except ValueError:
+            pass
+        if len(country) > 1:
+            break
+    return country
 
 def update_country_in_line(new_country, line):
     new_line = line.split(";")
