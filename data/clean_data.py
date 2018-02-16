@@ -5,8 +5,14 @@ Removes lines in the dataset that: contain null values, has incomplete
 data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
+
+TODO
+- country name similarity / standardized
+- Dont allow empty modifications
 """
 import os
+from bisect import bisect_left
+from difflib import get_close_matches
 
 from collections import Counter
 
@@ -92,6 +98,7 @@ def clean_locations_interactive():
     tempfile = "BX-Users-TempFile.csv"
     destfile = "BX-Users-Cleansed.csv"
     country_counts = collect_country_frequency(tempfile)
+    corpus = select_country_corpus(country_counts)
 
     with open(tempfile, 'r') as srcf, open(destfile, 'w') as destf:
         header = srcf.readline()
@@ -101,13 +108,15 @@ def clean_locations_interactive():
             *_, country = extract_city_state_country(line)
             if country_counts[country] < COUNT_THRESH:
                 print(f"Country Counts '{country}': {country_counts[country]}")
-
                 choice = user_menu()
                 if choice == "A":
                     # Do this to remember this entry is ok
                     country_counts[country] = COUNT_THRESH
                     destf.write(line)
                 if choice == "M":
+                    recs = get_recommendations(corpus, country)
+                    s = build_recs_message(recs)
+                    print(f"Suggestions: {s}")
                     line = update_line(line)
                     destf.write(line)
                 else:
@@ -153,6 +162,28 @@ def update_country_in_line(new_country, line):
 
 def remove_tempfile():
     os.remove("BX-Users-TempFile.csv")
+
+def select_country_corpus(corpus):
+    """
+    Creates a corpus of countries that have come up more than
+    COUNT_THRESH times
+    """
+    return [k for k,v in corpus.items() if v >= COUNT_THRESH]
+
+def get_recommendations(sorted_corpus, word, n=3):
+    """
+    Returns the top n most similar words in a corpus to word.
+    Performance shouldnt take a large hit since the program
+    spends most of its time waiting for input.
+    """
+    return get_close_matches(word, sorted_corpus, n=n)
+
+def build_recs_message(recs):
+    if len(recs) == 0:
+        s = "None"
+    else:
+        s = ''.join(f"{num}. {rec} " for num, rec in enumerate(recs, 1))
+    return s
 
 def main():
     clean_users()
