@@ -7,8 +7,9 @@ data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
 
 TODO
-- country name similarity / standardized
-- Dont allow empty modifications
+- add modifications to Suggestions
+- autocorrect occurences of countries that have already been modded
+- decide if showing recs belongs on modification screen or before
 """
 import os
 from bisect import bisect_left
@@ -146,24 +147,24 @@ def user_menu():
             return result
 
 def update_line(line, recs):
-    message = build_recs_message(recs)
-    country = get_updated_country(message, len(recs))
+    country = get_updated_country(recs)
     line = update_country_in_line(country, line)
     return line
 
-def get_updated_country(rec_message, rec_len):
+def get_updated_country(recs):
     """
     Gets user input to update country name while presenting options
     previously encountered in the data..
     Requirements: Name must be greater than 1 char
-    Returns the users input
+    Returns the users input. Recs is a list of strings
     """
+    message = build_recs_message(recs)
     while True:
-        print(f"Suggestions: {rec_message}")
+        print(f"Suggestions: {message}")
         country = input("New country: ").lower().strip("\" ")
         try:
             choice = int(country) - 1
-            if choice > -1 and choice < rec_len:
+            if choice > -1 and choice < len(recs):
                 country = recs[choice]
             else:
                 country = ""
