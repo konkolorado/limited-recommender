@@ -7,11 +7,13 @@ data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
 
 TODO
-- add modifications to Suggestions
-- autocorrect occurences of countries that have already been modded
-- decide if showing recs belongs on modification screen or before
+x add modifications to Suggestions
+x autocorrect occurences of countries that have already been modded
+x decide if showing recs belongs on modification screen or before
+- use TempFile module
 """
 import os
+from tempfile import TemporaryFile
 from bisect import bisect_left
 from difflib import get_close_matches
 
@@ -99,30 +101,47 @@ def clean_locations_interactive():
     tempfile = "BX-Users-TempFile.csv"
     destfile = "BX-Users-Cleansed.csv"
     country_counts = collect_country_frequency(tempfile)
-    corpus = select_country_corpus(country_counts)
+    corpus = countries_above_thresh(country_counts)
+    changes, rejections = {}, set()
 
     with open(tempfile, 'r') as srcf, open(destfile, 'w') as destf:
-        header = srcf.readline()
-        destf.write(header)
+        destf.write(srcf.readline()) # Header
 
         for line in srcf:
+            line = apply_changes_to_line(changes, line)
             *_, country = extract_city_state_country(line)
-            if country_counts[country] < COUNT_THRESH:
-                print(f"Country Counts '{country}': {country_counts[country]}")
-                choice = user_menu()
+
+            if country_counts[country] >= COUNT_THRESH:
+                destf.write(line)
+            elif country in rejections:
+                continue
+            else:
+                choice = user_menu(country_counts, country)
                 if choice == "A":
                     # Do this to remember this entry is ok
                     country_counts[country] = COUNT_THRESH
                     destf.write(line)
                 if choice == "M":
                     recs = get_recommendations(corpus, country)
-                    line = update_line(line, recs)
-                    destf.write(line)
+                    new_country = user_menu_update_country(recs)
+                    record_changes(changes, country, new_country)
+                    country_counts[new_country] = COUNT_THRESH
+                    corpus = countries_above_thresh(country_counts)
+                    destf.write(update_line(line, new_country))
                 else:
-                    continue # Reject line
-            else:
-                destf.write(line)
+                    rejections.add(country)
         remove_tempfile()
+
+def apply_changes_to_line(changes, line):
+    *_, country = extract_city_state_country(line)
+    if country in changes:
+        new_country = changes[country]
+        return update_line(line, new_country)
+    else:
+        return line
+
+def record_changes(all_changes, old, new):
+    all_changes[old] = new
 
 def collect_country_frequency(filename):
     """
@@ -140,18 +159,22 @@ def collect_country_frequency(filename):
 def extract_city_state_country(line):
     return line.split(";")[1].split(",")
 
-def user_menu():
+def user_menu(country_counts, country):
     while True:
+        print(f"Country Counts '{country}': {country_counts[country]}")
         result = input("Accept? Reject? Modify? [A/R/M]: ")
         if result == "A" or result == "R" or result == "M":
             return result
 
-def update_line(line, recs):
-    country = get_updated_country(recs)
-    line = update_country_in_line(country, line)
-    return line
+def update_line(line, new_country):
+    new_line = line.split(";")
+    location_data = new_line[1].split(",")
+    location_data[2] = new_country
+    new_line[1] = ','.join(location_data)
+    new_line = ';'.join(new_line)
+    return new_line
 
-def get_updated_country(recs):
+def user_menu_update_country(recs):
     """
     Gets user input to update country name while presenting options
     previously encountered in the data..
@@ -159,8 +182,9 @@ def get_updated_country(recs):
     Returns the users input. Recs is a list of strings
     """
     message = build_recs_message(recs)
+    print(f"Suggestions: {message}")
+
     while True:
-        print(f"Suggestions: {message}")
         country = input("New country: ").lower().strip("\" ")
         try:
             choice = int(country) - 1
@@ -174,23 +198,15 @@ def get_updated_country(recs):
             break
     return country
 
-def update_country_in_line(new_country, line):
-    new_line = line.split(";")
-    location_data = new_line[1].split(",")
-    location_data[2] = new_country
-    new_line[1] = ','.join(location_data)
-    new_line = ';'.join(new_line)
-    return new_line
-
 def remove_tempfile():
     os.remove("BX-Users-TempFile.csv")
 
-def select_country_corpus(corpus):
+def countries_above_thresh(counts):
     """
     Creates a corpus of countries that have come up more than
     COUNT_THRESH times
     """
-    return [k for k,v in corpus.items() if v >= COUNT_THRESH]
+    return [k for k,v in counts.items() if v >= COUNT_THRESH]
 
 def get_recommendations(sorted_corpus, word, n=3):
     """
@@ -208,6 +224,9 @@ def build_recs_message(recs):
     return s
 
 def main():
+    #with open(sourcefile, 'r', encoding="iso-8859-1") as srcf, \
+    #    tempfile.TemporaryFile('w', encoding="utf8") as tmpf, \
+    #    open(destfile, 'w', encoding="utf8") as destf:
     clean_users()
     clean_locations_interactive()
 
