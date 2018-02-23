@@ -4,8 +4,12 @@ Cleans data in the BX-Users, BX-Books, and BX-Book-Ratings datasets.
 Removes lines in the dataset that: contain null values, has incomplete
 data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 
+Presents the user lines in the dataset that have questionable location
+data for validation, rejection, or modification.
+
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
 """
+
 import os
 from tempfile import TemporaryFile
 from bisect import bisect_left
