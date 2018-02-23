@@ -106,7 +106,7 @@ def clean_locations_interactive(tmp_file, dest_file):
         elif country in rejections:
             continue
         else:
-            choice = user_menu(country_counts, country)
+            choice = user_menu(country_counts, corpus, country)
             if choice == "A":
                 # Do this to remember this entry is ok
                 country_counts[country] = COUNT_THRESH
@@ -148,10 +148,13 @@ def collect_country_frequency(fname):
 def extract_city_state_country(line):
     return line.split(";")[1].split(",")
 
-def user_menu(country_counts, country):
+def user_menu(country_counts, corpus, country):
+    recs = get_recommendations(corpus, country)
+    print(f"Country Counts '{country}': {country_counts[country]}")
     while True:
-        print(f"Country Counts '{country}': {country_counts[country]}")
-        result = input("Accept? Reject? Modify? [A/R/M]: ")
+        result = input("Accept? Reject? Modify? See suggestions? [A/R/M/S]: ")
+        if result == "S":
+            print(f"Recommendations: {build_recs_message(recs)}")
         if result == "A" or result == "R" or result == "M":
             return result
 
@@ -194,13 +197,13 @@ def countries_above_thresh(counts):
     """
     return [k for k,v in counts.items() if v >= COUNT_THRESH]
 
-def get_recommendations(sorted_corpus, word, n=3):
+def get_recommendations(corpus, word, n=3):
     """
     Returns the top n most similar words in a corpus to word.
     Performance shouldnt take a large hit since the program
     spends most of its time waiting for input.
     """
-    return get_close_matches(word, sorted_corpus, n=n)
+    return get_close_matches(word, corpus, n=n)
 
 def build_recs_message(recs):
     if len(recs) == 0:
