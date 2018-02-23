@@ -5,12 +5,6 @@ Removes lines in the dataset that: contain null values, has incomplete
 data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
-
-TODO
-x add modifications to Suggestions
-x autocorrect occurences of countries that have already been modded
-x decide if showing recs belongs on modification screen or before
-- use TempFile module
 """
 import os
 from tempfile import TemporaryFile
@@ -23,27 +17,23 @@ MAX_AGE = 100
 MIN_AGE = 10
 COUNT_THRESH = 10 # Locations appearing less often than this will be flagged
 
-def clean_users():
-    datafile = "BX-Users.csv"
-    destfile = "BX-Users-TempFile.csv"
-    with open(datafile, 'r', encoding="iso-8859-1") as srcf, \
-            open(destfile, 'w', encoding="utf8") as destf:
-        header = srcf.readline()
-        destf.write(header)
+def clean_users(src_file, tmp_file):
+    header = src_file.readline()
+    tmp_file.write(header)
 
-        for line in srcf:
-            if missing_data(line):
-                continue
-            if contains_nulls(line):
-                continue
-            if missing_location_data(line):
-                continue
-            if get_line_age(line) > MAX_AGE or get_line_age(line) < MIN_AGE:
-                continue
+    for line in src_file:
+        if missing_data(line):
+            continue
+        if contains_nulls(line):
+            continue
+        if missing_location_data(line):
+            continue
+        if get_line_age(line) > MAX_AGE or get_line_age(line) < MIN_AGE:
+            continue
 
-            line = process_data(line)
-            line.encode("utf8")
-            destf.write(line)
+        line = process_data(line)
+        line.encode("utf8")
+        tmp_file.write(line)
 
 def missing_data(line):
     return len(line.split(";")) != 3
@@ -90,7 +80,7 @@ def strip_whitespace(line):
     new_line[1] = ','.join(location)
     return ';'.join(new_line)
 
-def clean_locations_interactive():
+def clean_locations_interactive(tmp_file, dest_file):
     """
     Cleaning the city, state, country data is hard to do without
     human input. Here we collect the number of times the city, state,
@@ -98,39 +88,34 @@ def clean_locations_interactive():
     are presented to the user for validation or rejection. We assume
     that only country validity matters
     """
-    tempfile = "BX-Users-TempFile.csv"
-    destfile = "BX-Users-Cleansed.csv"
-    country_counts = collect_country_frequency(tempfile)
+    country_counts = collect_country_frequency(tmp_file)
     corpus = countries_above_thresh(country_counts)
     changes, rejections = {}, set()
 
-    with open(tempfile, 'r') as srcf, open(destfile, 'w') as destf:
-        destf.write(srcf.readline()) # Header
+    dest_file.write(tmp_file.readline()) # Header
+    for line in tmp_file:
+        line = apply_changes_to_line(changes, line)
+        *_, country = extract_city_state_country(line)
 
-        for line in srcf:
-            line = apply_changes_to_line(changes, line)
-            *_, country = extract_city_state_country(line)
-
-            if country_counts[country] >= COUNT_THRESH:
-                destf.write(line)
-            elif country in rejections:
-                continue
+        if country_counts[country] >= COUNT_THRESH:
+            dest_file.write(line)
+        elif country in rejections:
+            continue
+        else:
+            choice = user_menu(country_counts, country)
+            if choice == "A":
+                # Do this to remember this entry is ok
+                country_counts[country] = COUNT_THRESH
+                dest_file.write(line)
+            if choice == "M":
+                recs = get_recommendations(corpus, country)
+                new_country = user_menu_update_country(recs)
+                record_changes(changes, country, new_country)
+                country_counts[new_country] = COUNT_THRESH
+                corpus = countries_above_thresh(country_counts)
+                dest_file.write(update_line(line, new_country))
             else:
-                choice = user_menu(country_counts, country)
-                if choice == "A":
-                    # Do this to remember this entry is ok
-                    country_counts[country] = COUNT_THRESH
-                    destf.write(line)
-                if choice == "M":
-                    recs = get_recommendations(corpus, country)
-                    new_country = user_menu_update_country(recs)
-                    record_changes(changes, country, new_country)
-                    country_counts[new_country] = COUNT_THRESH
-                    corpus = countries_above_thresh(country_counts)
-                    destf.write(update_line(line, new_country))
-                else:
-                    rejections.add(country)
-        remove_tempfile()
+                rejections.add(country)
 
 def apply_changes_to_line(changes, line):
     *_, country = extract_city_state_country(line)
@@ -143,17 +128,17 @@ def apply_changes_to_line(changes, line):
 def record_changes(all_changes, old, new):
     all_changes[old] = new
 
-def collect_country_frequency(filename):
+def collect_country_frequency(fname):
     """
     Counts the number of times each country appears in the dataset.
     Returns dicts for each.
     """
     country_counts = Counter()
-    with open(filename, "r") as f:
-        _ = f.readline()
-        for line in f:
-            *_, country = extract_city_state_country(line)
-            country_counts[country] += 1
+    _ = fname.readline()
+    for line in fname:
+        *_, country = extract_city_state_country(line)
+        country_counts[country] += 1
+    fname.seek(0)
     return country_counts
 
 def extract_city_state_country(line):
@@ -198,9 +183,6 @@ def user_menu_update_country(recs):
             break
     return country
 
-def remove_tempfile():
-    os.remove("BX-Users-TempFile.csv")
-
 def countries_above_thresh(counts):
     """
     Creates a corpus of countries that have come up more than
@@ -224,11 +206,14 @@ def build_recs_message(recs):
     return s
 
 def main():
-    #with open(sourcefile, 'r', encoding="iso-8859-1") as srcf, \
-    #    tempfile.TemporaryFile('w', encoding="utf8") as tmpf, \
-    #    open(destfile, 'w', encoding="utf8") as destf:
-    clean_users()
-    clean_locations_interactive()
+    sourcefile = "BX-Users.csv"
+    destfile = "BX-Users-Cleansed.csv"
+    with open(sourcefile, 'r', encoding="iso-8859-1") as srcf, \
+      TemporaryFile('w+', encoding="utf8") as tmpf, \
+      open(destfile, 'w', encoding="utf8") as destf:
+        clean_users(srcf, tmpf)
+        tmpf.seek(0)
+        clean_locations_interactive(tmpf, destf)
 
 if __name__ == '__main__':
     main()
