@@ -1,21 +1,28 @@
 """
-Performs a k-means clustering to cluster users. Omits users with null
-values
+Provides at a glance information of the user dataset
 """
 
 import matplotlib.pyplot as plt
-import csv
 from collections import Counter
 
 locations = Counter()
 ages = Counter()
 
-def plot(counter):
+def plot_locations(counter):
+    counts, locs = zip(*sorted(zip(counter.values(), counter.keys())))
+    plt.title("Counts for the 35 most recurring nations")
+    plt.xlabel("Counts")
+    plt.scatter(counts[-35:], locs[-35:])
+    plt.show()
+
+def plot_ages(counter):
     ages, counts = zip(*sorted(zip(counter.keys(), counter.values())))
+    plt.title("User age frequencies")
+    plt.xlabel("Age")
     plt.scatter(ages, counts)
     plt.show()
 
-with open("BX-Users.csv", "r", encoding="iso-8859-1") as userfile:
+with open("BX-Users-Cleansed.csv", "r") as userfile:
     _ = userfile.readline()
     for line in userfile:
         line.encode('utf8')
@@ -25,13 +32,9 @@ with open("BX-Users.csv", "r", encoding="iso-8859-1") as userfile:
             continue
 
         age = int(line[-1].strip("\""))
-        if age > 70:
-            print(line)
         country = line[0].strip("\" ").split(",")[-1]
         locations[country] += 1
         ages[age] += 1
 
-#print(locations)
-#print(ages)
-#plot(locations)
-plot(ages)
+plot_locations(locations)
+plot_ages(ages)

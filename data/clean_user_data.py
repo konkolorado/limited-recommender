@@ -8,13 +8,14 @@ Presents the user lines in the dataset that have questionable location
 data for validation, rejection, or modification.
 
 Rewrites the data to filenames with  '-Cleansed' appended to the filenames
+
+- TODO leverage csv library
 """
 
 import os
 from tempfile import TemporaryFile
 from bisect import bisect_left
 from difflib import get_close_matches
-
 from collections import Counter
 
 MAX_AGE = 100
