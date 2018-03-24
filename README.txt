@@ -1,3 +1,7 @@
+Deploying all tests in docker environment
+- ./deploy_tests.sh
+
+
 Running tests
 - Run all tests
 - $ python3.6 -m unittest discover
