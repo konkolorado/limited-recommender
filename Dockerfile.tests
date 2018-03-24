@@ -1,13 +1,12 @@
 FROM python:3.6.3-slim
 
-RUN mkdir /app
+RUN mkdir -p /app/RecommenderSystem/recommendersystem
+WORKDIR /app/RecommenderSystem/recommendersystem
 
-WORKDIR /app
+ENV PYTHONPATH=/app
 
 ADD requirements.txt .
+ADD recommendersystem/ .
 
 RUN pip3 install -r requirements.txt
-
-ADD . .
-
 CMD ["python", "-m", "unittest", "discover"]

@@ -1,0 +1,4 @@
+- Verify that files in scripts still work
+  - Check that they won't delete / overwrite the cleansed data files
+
+- Add files and new project structure to git
