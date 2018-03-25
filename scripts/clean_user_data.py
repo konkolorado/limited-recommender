@@ -1,5 +1,5 @@
 """
-Cleans data in the BX-Users, BX-Books, and BX-Book-Ratings datasets.
+Cleans data in the BX-Users dataset.
 
 Removes lines in the dataset that: contain null values, has incomplete
 data, has extraneous ages. Rewrites valid lines as utf8 encoded.
@@ -7,7 +7,7 @@ data, has extraneous ages. Rewrites valid lines as utf8 encoded.
 Presents the user lines in the dataset that have questionable location
 data for validation, rejection, or modification.
 
-Rewrites the data to filenames with  '-Cleansed' appended to the filenames
+Rewrites the data to a new file
 
 - TODO leverage csv library
 """
@@ -20,6 +20,7 @@ from difflib import get_close_matches
 from collections import Counter
 
 import user_interaction
+import file_checks
 
 data_directory = os.path.abspath("../data") + os.sep
 source_data = data_directory + "BX-Users.csv"
@@ -241,18 +242,18 @@ def get_new_country_from_user(suggestions):
 def update_changes(all_changes, old, new):
     all_changes[old] = new
 
-def check_data_files(datadir, srcdata, procdata):
+def do_file_checks(datadir, srcdata, procdata):
     """
     Performs validation to ensure datadir is a valid location,
     srcdata exists, and procdata does not exist.  Aborts if
     datadir or srcdata do not exist. Asks to proceed if procdata
     already exists
     """
-    assert(os.path.isdir(datadir)), f"{datadir} does not exist"
-    assert(os.path.isfile(srcdata)), f"{srcdata} does not exist"
+    file_checks.assert_location_exists(datadir)
+    file_checks.assert_file_exists(srcdata)
     try:
-        assert( not os.path.isfile(procdata))
-    except:
+        file_checks.assert_file_not_exists(procdata)
+    except AssertionError:
         message = f"File {procdata} already exists. If you proceed it " \
         "will be overwritten. Continue anyways?"
         response = user_interaction.force_user_input(["Y", "n"], message)
@@ -260,7 +261,7 @@ def check_data_files(datadir, srcdata, procdata):
             sys.exit()
 
 def main():
-    check_data_files(data_directory, source_data, processed_data)
+    do_file_checks(data_directory, source_data, processed_data)
 
     with open(source_data, 'r', encoding="iso-8859-1") as src, \
          TemporaryFile('w+', encoding="utf8", dir=data_directory) as tmp,          \
