@@ -13,32 +13,49 @@ Rewrites the data to filenames with  '-Cleansed' appended to the filenames
 """
 
 import os
+import sys
 from tempfile import TemporaryFile
 from bisect import bisect_left
 from difflib import get_close_matches
 from collections import Counter
 
+import user_interaction
+
+data_directory = os.path.abspath("../data") + os.sep
+source_data = data_directory + "BX-Users.csv"
+processed_data = data_directory + "BX-Users-Cleansed.csv"
+
 MAX_AGE = 100
 MIN_AGE = 10
-COUNT_THRESH = 10 # Locations appearing less often than this will be flagged
+MAX_COUNT_THRESH = 10 # Locations appearing more than this are auto accepted
+MIN_COUNT_THRESH = 1  # Locations appearing less than this are auto rejected
+FILL_UNK = True       # Rejected locations are replaced with an UNK token
+TOKEN = "unk"
 
-def clean_users(src_file, tmp_file):
-    header = src_file.readline()
-    tmp_file.write(header)
+def clean_users(src_stream, tmp_stream):
+    dels, count = 0, 0
+    tmp_stream.write(src_stream.readline()) # Header
 
-    for line in src_file:
+    for line in src_stream:
         if missing_data(line):
+            dels += 1
             continue
         if contains_nulls(line):
+            dels += 1
             continue
-        if missing_location_data(line):
-            continue
+        if missing_country_data(line):
+            if FILL_UNK:
+                line = update_line_country(line, TOKEN)
+            else:
+                dels += 1
+                continue
         if get_line_age(line) > MAX_AGE or get_line_age(line) < MIN_AGE:
+            dels += 1
             continue
-
+        count += 1
         line = process_data(line)
         line.encode("utf8")
-        tmp_file.write(line)
+        tmp_stream.write(line)
 
 def missing_data(line):
     return len(line.split(";")) != 3
@@ -46,12 +63,11 @@ def missing_data(line):
 def contains_nulls(line):
     return "NULL" in line
 
-def missing_location_data(line):
-    location = line.split(";")[1]
-    location = location.split(",")
-    if len(location) != 3:
+def missing_country_data(line):
+    *_, country = extract_city_state_country(line)
+    country = country.replace('"', '')
+    if country in ["", " ", "n/a"]:
         return True
-    return any(loc == "" or loc == " " for loc in location)
 
 def get_line_age(line):
     return int(line.strip().split(";")[-1].strip("\""))
@@ -85,7 +101,7 @@ def strip_whitespace(line):
     new_line[1] = ','.join(location)
     return ';'.join(new_line)
 
-def clean_locations_interactive(tmp_file, dest_file):
+def clean_locations(tmp_stream, dest_stream):
     """
     Cleaning the city, state, country data is hard to do without
     human input. Here we collect the number of times the city, state,
@@ -93,135 +109,165 @@ def clean_locations_interactive(tmp_file, dest_file):
     are presented to the user for validation or rejection. We assume
     that only country validity matters
     """
-    country_counts = collect_country_frequency(tmp_file)
-    corpus = countries_above_thresh(country_counts)
-    changes, rejections = {}, set()
+    country_counts = get_country_counts(tmp_stream)
+    accepted_countries = get_countries_above_max_threshold(country_counts)
+    rejected_countries = get_countries_below_min_threshold(country_counts)
+    changes = {}
 
-    dest_file.write(tmp_file.readline()) # Header
-    for line in tmp_file:
-        line = apply_changes_to_line(changes, line)
+    dest_stream.write(tmp_stream.readline()) # Header
+    for line in tmp_stream:
+        line = apply_user_changes_to_line(changes, line)
         *_, country = extract_city_state_country(line)
 
-        if country_counts[country] >= COUNT_THRESH:
-            dest_file.write(line)
-        elif country in rejections:
-            continue
+        if country in accepted_countries:
+            dest_stream.write(line)
+        elif country in rejected_countries:
+            if FILL_UNK:
+                update_changes(changes, country, TOKEN)
+                line = update_line_country(line, TOKEN)
+                dest_stream.write(line)
         else:
-            choice = user_menu(country_counts, corpus, country)
-            if choice == "A":
-                # Do this to remember this entry is ok
-                country_counts[country] = COUNT_THRESH
-                dest_file.write(line)
-            if choice == "M":
-                recs = get_recommendations(corpus, country)
-                new_country = user_menu_update_country(recs)
-                record_changes(changes, country, new_country)
-                country_counts[new_country] = COUNT_THRESH
-                corpus = countries_above_thresh(country_counts)
-                dest_file.write(update_line(line, new_country))
-            else:
-                rejections.add(country)
+            recs = get_recommendations(accepted_countries, country)
+            response = ask_user(country_counts, country, recs)
+            if response == "R":
+                rejected_countries.add(country)
+                line = update_line_country(line, TOKEN)
+            if response == "A":
+                accepted_countries.add(country)
+            if response == "M":
+                new_country = get_new_country_from_user(recs)
+                update_changes(changes, country, new_country)
+                accepted_countries.add(new_country)
+                line = update_line_country(line, new_country)
+            if response in ["A", "M"] or FILL_UNK:
+                dest_stream.write(line)
 
-def apply_changes_to_line(changes, line):
-    *_, country = extract_city_state_country(line)
-    if country in changes:
-        new_country = changes[country]
-        return update_line(line, new_country)
-    else:
-        return line
-
-def record_changes(all_changes, old, new):
-    all_changes[old] = new
-
-def collect_country_frequency(fname):
+def get_country_counts(fname):
     """
-    Counts the number of times each country appears in the dataset.
-    Returns dicts for each.
+    Records the number of times each country appears in the dataset
     """
-    country_counts = Counter()
     _ = fname.readline()
+
+    country_counts = Counter()
     for line in fname:
         *_, country = extract_city_state_country(line)
         country_counts[country] += 1
     fname.seek(0)
     return country_counts
 
+def get_countries_above_max_threshold(counts):
+    """
+    Creates a set of countries that have come up more than
+    MAX_COUNT_THRESH times
+    """
+    return set(k for k,v in counts.items() if v >= MAX_COUNT_THRESH)
+
+def get_countries_below_min_threshold(counts):
+    """
+    Creates a set of countries that have come up less than
+    MIN_COUNT_THRESH times. This signals they are automatically rejected
+    """
+    return set(k for k,v in counts.items() if v <= MIN_COUNT_THRESH)
+
+def apply_user_changes_to_line(changes, line):
+    *_, country = extract_city_state_country(line)
+    if country in changes:
+        new_country = changes[country]
+        return update_line_country(line, new_country)
+    else:
+        return line
+
 def extract_city_state_country(line):
     return line.split(";")[1].split(",")
 
-def user_menu(country_counts, corpus, country):
-    recs = get_recommendations(corpus, country)
-    print(f"Country Counts '{country}': {country_counts[country]}")
-    while True:
-        result = input("Accept? Reject? Modify? See suggestions? [A/R/M/S]: ")
-        if result == "S":
-            print(f"Recommendations: {build_recs_message(recs)}")
-        if result == "A" or result == "R" or result == "M":
-            return result
-
-def update_line(line, new_country):
+def update_line_country(line, new_country):
     new_line = line.split(";")
     location_data = new_line[1].split(",")
-    location_data[2] = new_country
+    location_data[-1] = new_country
     new_line[1] = ','.join(location_data)
     new_line = ';'.join(new_line)
     return new_line
 
-def user_menu_update_country(recs):
+def get_recommendations(corpus, word, n=3):
     """
-    Gets user input to update country name while presenting options
-    previously encountered in the data..
-    Requirements: Name must be greater than 1 char
-    Returns the users input. Recs is a list of strings
+    Returns the top n most similar words in a corpus to word.
     """
-    message = build_recs_message(recs)
-    print(f"Suggestions: {message}")
+    return get_close_matches(word, corpus, n=n)
+
+def ask_user(country_counts, country, suggestions):
+    message = "Accept? Reject? Modify? See suggestions?"
+    recs_message = build_recs_message(suggestions)
+
+    print(f"Country Counts '{country}': {country_counts[country]}")
+    response = user_interaction.force_user_input(["A", "R", "M", "S"],
+                                                message)
+    while response == "S":
+        response = user_interaction.force_user_input(["A", "R", "M", "S"],
+                                                    recs_message)
+    return response
+
+def build_recs_message(recs):
+    if len(recs) == 0:
+        s = "Suggestions: None"
+    else:
+        s = ''.join(f"{num}. {rec} " for num, rec in enumerate(recs, 1))
+        s = "Suggestions: " + s
+    return s
+
+def get_new_country_from_user(suggestions):
+    """
+    Gets user input to update country while presenting valid options seen
+    in the data.
+    Requirements: Updated country name must be greater than 1 char
+    Params:
+        suggestions: a list of possible country
+    Returns a new country name
+    """
+    recs_message = build_recs_message(suggestions)
+    print(f"{recs_message}")
 
     while True:
         country = input("New country: ").lower().strip("\" ")
         try:
             choice = int(country) - 1
-            if choice > -1 and choice < len(recs):
-                country = recs[choice]
-            else:
-                country = ""
+            if choice > -1 and choice < len(suggestions):
+                country = suggestions[choice]
+                break
         except ValueError:
-            pass
-        if len(country) > 1:
-            break
+            if len(country) > 1:
+                break
     return country
 
-def countries_above_thresh(counts):
-    """
-    Creates a corpus of countries that have come up more than
-    COUNT_THRESH times
-    """
-    return [k for k,v in counts.items() if v >= COUNT_THRESH]
+def update_changes(all_changes, old, new):
+    all_changes[old] = new
 
-def get_recommendations(corpus, word, n=3):
+def check_data_files(datadir, srcdata, procdata):
     """
-    Returns the top n most similar words in a corpus to word.
-    Performance shouldnt take a large hit since the program
-    spends most of its time waiting for input.
+    Performs validation to ensure datadir is a valid location,
+    srcdata exists, and procdata does not exist.  Aborts if
+    datadir or srcdata do not exist. Asks to proceed if procdata
+    already exists
     """
-    return get_close_matches(word, corpus, n=n)
-
-def build_recs_message(recs):
-    if len(recs) == 0:
-        s = "None"
-    else:
-        s = ''.join(f"{num}. {rec} " for num, rec in enumerate(recs, 1))
-    return s
+    assert(os.path.isdir(datadir)), f"{datadir} does not exist"
+    assert(os.path.isfile(srcdata)), f"{srcdata} does not exist"
+    try:
+        assert( not os.path.isfile(procdata))
+    except:
+        message = f"File {procdata} already exists. If you proceed it " \
+        "will be overwritten. Continue anyways?"
+        response = user_interaction.force_user_input(["Y", "n"], message)
+        if response == "n":
+            sys.exit()
 
 def main():
-    sourcefile = "BX-Users.csv"
-    destfile = "BX-Users-Cleansed.csv"
-    with open(sourcefile, 'r', encoding="iso-8859-1") as srcf, \
-      TemporaryFile('w+', encoding="utf8") as tmpf, \
-      open(destfile, 'w', encoding="utf8") as destf:
-        clean_users(srcf, tmpf)
-        tmpf.seek(0)
-        clean_locations_interactive(tmpf, destf)
+    check_data_files(data_directory, source_data, processed_data)
+
+    with open(source_data, 'r', encoding="iso-8859-1") as src, \
+         TemporaryFile('w+', encoding="utf8", dir=data_directory) as tmp,          \
+         open(processed_data, 'w', encoding="utf8") as dest:
+        clean_users(src, tmp)
+        tmp.seek(0)
+        clean_locations(tmp, dest)
 
 if __name__ == '__main__':
     main()
