@@ -6,6 +6,8 @@ import os
 import matplotlib.pyplot as plt
 from collections import Counter
 
+import file_checks
+
 data_directory = os.path.abspath("../data") + os.sep
 source_data = data_directory + "BX-Users-Cleansed.csv"
 
@@ -24,6 +26,9 @@ def plot_ages(counter):
     plt.show()
 
 def main():
+    file_checks.assert_location_exists(data_directory)
+    file_checks.assert_file_exists(source_data)
+
     locations, ages = Counter(), Counter()
     with open(source_data, "r") as userfile:
         _ = userfile.readline()
