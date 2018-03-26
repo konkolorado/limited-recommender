@@ -1,14 +1,16 @@
 """
 Cleans data in the BX-Books-Ratings dataset
 
-This should run after the BX-Users dataset has been cleaned
+This should run after the BX-Users and the BX-Books datasets have
+been cleaned.
 
 This script removes ratings from users that no longer exist in the
-BX-Users dataset.  Those users may have been removed because their
-data was clearly bogus and or incomplete.
+BX-Users dataset and removes ratings for books that no longer exist
+in the BX-Books dataset.  Those users/books may have been removed
+because their data was clearly bogus and or incomplete.
 
-This script removes lines that contain null values.  The script also
-rewrites lines as UTF-8 encoding.
+This script also removes lines that contain null values and rewrites
+lines in UTF-8 encoding.
 """
 
 import os
