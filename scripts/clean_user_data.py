@@ -28,32 +28,30 @@ processed_data = data_directory + "BX-Users-Cleansed.csv"
 
 MAX_AGE = 100
 MIN_AGE = 10
-MAX_COUNT_THRESH = 10 # Locations appearing more than this are auto accepted
+MAX_COUNT_THRESH = 930 # Locations appearing more than this are auto accepted
 MIN_COUNT_THRESH = 1  # Locations appearing less than this are auto rejected
 FILL_UNK = True       # Rejected locations are replaced with an UNK token
 TOKEN = "unk"
 
 def clean_users(src_stream, tmp_stream):
-    dels, count = 0, 0
     tmp_stream.write(src_stream.readline()) # Header
 
     for line in src_stream:
         if missing_data(line):
-            dels += 1
             continue
-        if contains_nulls(line):
-            dels += 1
-            continue
+        if missing_age(line):
+            if FILL_UNK:
+                line = update_line_age(line, TOKEN)
+            else:
+                continue
         if missing_country_data(line):
             if FILL_UNK:
                 line = update_line_country(line, TOKEN)
             else:
-                dels += 1
                 continue
         if get_line_age(line) > MAX_AGE or get_line_age(line) < MIN_AGE:
-            dels += 1
             continue
-        count += 1
+
         line = process_data(line)
         line.encode("utf8")
         tmp_stream.write(line)
@@ -61,17 +59,33 @@ def clean_users(src_stream, tmp_stream):
 def missing_data(line):
     return len(line.split(";")) != 3
 
-def contains_nulls(line):
-    return "NULL" in line
+def missing_age(line):
+    line = line.split(';')
+    try:
+        age = line[-1].strip()
+    except IndexError:
+        return True
+    if age == "NULL":
+        return True
+    return False
+
+def update_line_age(line, symbol):
+    new_line = line.split(";")
+    new_line[-1] = symbol
+    new_line = ';'.join(new_line) + '\n'
+    return new_line
 
 def missing_country_data(line):
     *_, country = extract_city_state_country(line)
     country = country.replace('"', '')
-    if country in ["", " ", "n/a"]:
+    if country.strip() in ["", " ", "n/a", "NULL"]:
         return True
 
 def get_line_age(line):
-    return int(line.strip().split(";")[-1].strip("\""))
+    line = line.strip().split(";")
+    if line[-1] == TOKEN:
+        return MAX_AGE - 1
+    return int(line[-1].strip("\""))
 
 def process_data(line):
     """

@@ -23,7 +23,8 @@ import user_interaction
 
 data_directory = os.path.abspath("../data") + os.sep
 users_dataset = data_directory + "BX-Users-Cleansed.csv"
-ratings_data = data_directory + "BX-Book-Ratings.csv"
+books_dataset = data_directory + "BX-Books-Cleansed.csv"
+ratings_dataset = data_directory + "BX-Book-Ratings.csv"
 processed_data = data_directory + "BX-Book-Ratings-Cleansed.csv"
 
 def collect_user_ids(src_file):
@@ -40,17 +41,30 @@ def collect_user_ids(src_file):
     assert sorted(ids) == ids, "User ids are out of order"
     return ids
 
-def keep_ratings_from_valid_users(ratings_file, proc_file, user_ids):
+def collect_book_isbns(src_file):
+    """
+    Stores and returns ISBNs in a set
+    """
+    isbns = set()
+    with open(src_file, 'r', encoding="iso-8859-1") as src:
+        reader = csv.DictReader(src, delimiter=",")
+        for row in reader:
+            isbns.add(row["ISBN"])
+    return isbns
+
+def keep_valid_ratings(ratings_file, proc_file, ids, isbns):
     with open(ratings_file, 'r', encoding="iso-8859-1") as ratings, \
          open(proc_file, 'w', encoding="utf8") as dest:
         reader = csv.DictReader(ratings, delimiter=';')
         writer = csv.DictWriter(dest, reader.fieldnames)
         writer.writeheader()
+
         for row in reader:
             if "NULL" in row:
                 continue
-            if valid_id(user_ids, int(row["User-ID"])):
-                writer.writerow(row)
+            elif valid_id(ids, int(row["User-ID"])) and \
+               valid_isbn(isbns, row["ISBN"]):
+                    writer.writerow(row)
 
 def valid_id(ids, curr_id):
     i  = bisect_left(ids, curr_id)
@@ -59,9 +73,13 @@ def valid_id(ids, curr_id):
     else:
         return False
 
-def do_file_checks(datadir, usersdata, ratingsdata, procdata):
+def valid_isbn(isbns, curr_isbn):
+    return curr_isbn in isbns
+
+def do_file_checks(datadir, usersdata, booksdata, ratingsdata, procdata):
     file_checks.assert_location_exists(datadir)
     file_checks.assert_file_exists(usersdata)
+    file_checks.assert_file_exists(booksdata)
     file_checks.assert_file_exists(ratingsdata)
     try:
         file_checks.assert_file_not_exists(procdata)
@@ -73,10 +91,12 @@ def do_file_checks(datadir, usersdata, ratingsdata, procdata):
             sys.exit()
 
 def main():
-    do_file_checks(data_directory, users_dataset, ratings_data, processed_data)
+    do_file_checks(data_directory, users_dataset, books_dataset,
+                   ratings_dataset, processed_data)
 
     user_ids = collect_user_ids(users_dataset)
-    keep_ratings_from_valid_users(ratings_data, processed_data, user_ids)
+    book_isbns = collect_book_isbns(books_dataset)
+    keep_valid_ratings(ratings_dataset, processed_data, user_ids, book_isbns)
 
 if __name__ == '__main__':
     main()
