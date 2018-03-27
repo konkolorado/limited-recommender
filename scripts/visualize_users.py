@@ -10,6 +10,7 @@ import file_checks
 
 data_directory = os.path.abspath("../data") + os.sep
 source_data = data_directory + "BX-Users-Cleansed.csv"
+TOKEN = "unk"
 
 def plot_locations(counter):
     counts, locs = zip(*sorted(zip(counter.values(), counter.keys())))
@@ -34,7 +35,10 @@ def main():
         _ = userfile.readline()
         for line in userfile:
             line = line.strip().split(";")[1:]
-            age = int(line[-1].strip("\""))
+            try:
+                age = int(line[-1].strip("\""))
+            except ValueError:
+                continue
             country = line[0].strip("\" ").split(",")[-1]
             locations[country] += 1
             ages[age] += 1
