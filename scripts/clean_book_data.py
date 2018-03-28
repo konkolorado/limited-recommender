@@ -22,7 +22,7 @@ def clean_books(src_file, dest_file):
     with open(src_file, 'r', encoding='iso-8859-1') as src, \
          open(dest_file, 'w', encoding='utf8') as dest:
         reader = csv.DictReader(src, delimiter=';')
-        writer = csv.DictWriter(dest, reader.fieldnames)
+        writer = csv.DictWriter(dest, reader.fieldnames, delimiter=';')
 
         writer.writeheader()
         for row in reader:

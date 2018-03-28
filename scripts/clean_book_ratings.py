@@ -47,7 +47,7 @@ def collect_book_isbns(src_file):
     """
     isbns = set()
     with open(src_file, 'r', encoding="iso-8859-1") as src:
-        reader = csv.DictReader(src, delimiter=",")
+        reader = csv.DictReader(src, delimiter=";")
         for row in reader:
             isbns.add(row["ISBN"])
     return isbns
@@ -56,7 +56,7 @@ def keep_valid_ratings(ratings_file, proc_file, ids, isbns):
     with open(ratings_file, 'r', encoding="iso-8859-1") as ratings, \
          open(proc_file, 'w', encoding="utf8") as dest:
         reader = csv.DictReader(ratings, delimiter=';')
-        writer = csv.DictWriter(dest, reader.fieldnames)
+        writer = csv.DictWriter(dest, reader.fieldnames, delimiter=";")
         writer.writeheader()
 
         for row in reader:
