@@ -6,7 +6,6 @@ lines in UTF-8 encoding.
 """
 
 import os
-import sys
 import csv
 
 import file_checks
@@ -42,7 +41,7 @@ def do_file_checks(datadir, bookdata, procdata):
         "will be overwritten. Continue anyways?"
         response = user_interaction.force_user_input(["Y", "n"], message)
         if response == "n":
-            sys.exit()
+            raise SystemExit()
 
 def main():
     do_file_checks(data_directory, book_dataset, processed_data)

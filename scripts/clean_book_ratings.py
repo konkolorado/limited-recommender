@@ -14,7 +14,6 @@ lines in UTF-8 encoding.
 """
 
 import os
-import sys
 import csv
 from bisect import bisect_left
 
@@ -89,7 +88,7 @@ def do_file_checks(datadir, usersdata, booksdata, ratingsdata, procdata):
         "will be overwritten. Continue anyways?"
         response = user_interaction.force_user_input(["Y", "n"], message)
         if response == "n":
-            sys.exit()
+            raise SystemExit()
 
 def main():
     do_file_checks(data_directory, users_dataset, books_dataset,

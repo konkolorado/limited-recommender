@@ -13,7 +13,7 @@ Rewrites the data to a new file
 """
 
 import os
-import sys
+
 from tempfile import TemporaryFile
 from bisect import bisect_left
 from difflib import get_close_matches
@@ -272,7 +272,7 @@ def do_file_checks(datadir, srcdata, procdata):
         "will be overwritten. Continue anyways?"
         response = user_interaction.force_user_input(["Y", "n"], message)
         if response == "n":
-            sys.exit()
+            raise SystemExit()
 
 def main():
     do_file_checks(data_directory, source_data, processed_data)
