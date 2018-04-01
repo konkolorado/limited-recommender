@@ -56,7 +56,8 @@ def keep_valid_ratings(ratings_file, proc_file, ids, isbns):
     with open(ratings_file, 'r', encoding="iso-8859-1") as ratings, \
          open(proc_file, 'w', encoding="utf8") as dest:
         reader = csv.DictReader(ratings, delimiter=';')
-        writer = csv.DictWriter(dest, reader.fieldnames, delimiter=";")
+        writer = csv.DictWriter(dest, reader.fieldnames, delimiter=";",
+            quoting=csv.QUOTE_ALL)
         writer.writeheader()
 
         for row in reader:
