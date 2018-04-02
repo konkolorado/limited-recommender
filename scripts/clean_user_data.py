@@ -13,6 +13,7 @@ Rewrites the data to a new file
 """
 
 import os
+import csv
 
 from tempfile import TemporaryFile
 from bisect import bisect_left
@@ -23,98 +24,80 @@ import user_interaction
 import file_checks
 
 data_directory = os.path.abspath("../data") + os.sep
-source_data = data_directory + "BX-Users.csv"
-processed_data = data_directory + "BX-Users-Cleansed.csv"
+source_data = data_directory + "BX-Users-Cleansed.csv"
+processed_data = data_directory + "BX-Users-Cleansed-2.csv"
 
 MAX_AGE = 100
 MIN_AGE = 10
-MAX_COUNT_THRESH = 930 # Locations appearing more than this are auto accepted
+MAX_COUNT_THRESH = 500000 # Locations appearing more than this are auto accepted
 MIN_COUNT_THRESH = 1  # Locations appearing less than this are auto rejected
-FILL_UNK = True       # Rejected locations are replaced with an UNK token
+DROP_UNK = False      # Drop empty/null data or replace with a token
 TOKEN = "unk"
 
 def clean_users(src_stream, tmp_stream):
-    tmp_stream.write(src_stream.readline()) # Header
+    reader = csv.DictReader(src_stream, delimiter=';')
+    writer = csv.DictWriter(tmp_stream, reader.fieldnames, delimiter=";",
+        quoting=csv.QUOTE_ALL)
+    writer.writeheader()
 
-    for line in src_stream:
-        if missing_data(line):
+    for row in reader:
+        if missing_data(row):
             continue
-        if missing_age(line):
-            if FILL_UNK:
-                line = update_line_age(line, TOKEN)
-            else:
+        if missing_age(row):
+            if DROP_UNK:
                 continue
-        if missing_country_data(line):
-            if FILL_UNK:
-                line = update_line_country(line, TOKEN)
-            else:
+            update_row_age(row, TOKEN)
+        if missing_country_data(row):
+            if DROP_UNK:
                 continue
-        if get_line_age(line) > MAX_AGE or get_line_age(line) < MIN_AGE:
+            update_row_country(row, TOKEN)
+        if get_row_age(row) > MAX_AGE or get_row_age(row) < MIN_AGE:
             continue
 
-        line = process_data(line)
-        line.encode("utf8")
-        tmp_stream.write(line)
+        process_data(row)
+        writer.writerow(row)
 
-def missing_data(line):
-    return len(line.split(";")) != 3
+def missing_data(row):
+    return len(row) != 3
 
-def missing_age(line):
-    line = line.split(';')
-    try:
-        age = line[-1].strip()
-    except IndexError:
-        return True
-    if age == "NULL":
-        return True
-    return False
+def missing_age(row):
+    return row["Age"] in ["NULL", ""]
 
-def update_line_age(line, symbol):
-    new_line = line.split(";")
-    new_line[-1] = symbol
-    new_line = ';'.join(new_line) + '\n'
-    return new_line
+def update_row_age(row, symbol):
+    row["Age"] = symbol
 
-def missing_country_data(line):
-    *_, country = extract_city_state_country(line)
-    country = country.replace('"', '')
+def missing_country_data(row):
+    location = row["Location"]
+    country = extract_country_from_location(location)
     if country.strip() in ["", " ", "n/a", "NULL"]:
         return True
 
-def get_line_age(line):
-    line = line.strip().split(";")
-    if line[-1] == TOKEN:
+def extract_country_from_location(location):
+    country = location.split(',')[-1]
+    country = country.replace('"', '')
+    return country
+
+def get_row_age(row):
+    age = row["Age"]
+    if age == TOKEN:
         return MAX_AGE - 1
-    return int(line[-1].strip("\""))
+    return int(age)
 
-def process_data(line):
+def process_data(row):
     """
-    Modifies the data in the line to be: all lowercase, stripped
-    of extra quotation chars, and stripped of internal whitespace.
-    Returns the new line
+    Modifies the data in the line to be: all lowercase
+    and stripped of internal whitespace.
     """
-    line = lowercase(line)
-    line = strip_quotes(line)
-    line = strip_whitespace(line)
-    return line
+    lowercase(row)
+    strip_whitespace(row)
 
-def lowercase(line):
-    new_line = line.split(';')
-    new_line[1] = new_line[1].lower()
-    return ';'.join(new_line)
+def lowercase(row):
+    row["Location"] = row["Location"].lower()
 
-def strip_quotes(line):
-    new_line = line.split(';')
-    new_line = [info.strip('\"') for info in new_line]
-    new_line[-1] = new_line[-1].replace("\"", "")
-    return ';'.join(new_line)
-
-def strip_whitespace(line):
-    new_line = line.split(';')
-    location = new_line[1].split(",")
-    location = [data.strip() for data in location]
-    new_line[1] = ','.join(location)
-    return ';'.join(new_line)
+def strip_whitespace(row):
+    location = row["Location"].split(",")
+    stripped = [l.strip() for l in location]
+    row["Location"] = ','.join(stripped)
 
 def clean_locations(tmp_stream, dest_stream):
     """
@@ -124,51 +107,58 @@ def clean_locations(tmp_stream, dest_stream):
     are presented to the user for validation or rejection. We assume
     that only country validity matters
     """
-    country_counts = get_country_counts(tmp_stream)
+    reader = csv.DictReader(tmp_stream, delimiter=';')
+    writer = csv.DictWriter(dest_stream, reader.fieldnames, delimiter=";",
+        quoting=csv.QUOTE_ALL)
+    writer.writeheader()
+
+    country_counts = get_country_counts(tmp_stream, reader)
     accepted_countries = get_countries_above_max_threshold(country_counts)
     rejected_countries = get_countries_below_min_threshold(country_counts)
     changes = {}
 
-    dest_stream.write(tmp_stream.readline()) # Header
-    for line in tmp_stream:
-        line = apply_user_changes_to_line(changes, line)
-        *_, country = extract_city_state_country(line)
+    tmp_stream.readline() # Gets DictReader to skip headerline
+    for row in reader:
+        apply_user_changes_to_line(changes, row)
+        country = extract_country_from_location(row["Location"])
 
         if country in accepted_countries:
-            dest_stream.write(line)
+            writer.writerow(row)
         elif country in rejected_countries:
-            if FILL_UNK:
+            if not DROP_UNK:
                 update_changes(changes, country, TOKEN)
-                line = update_line_country(line, TOKEN)
-                dest_stream.write(line)
+                update_row_country(row, TOKEN)
+                writer.writerow(row)
         else:
             recs = get_recommendations(accepted_countries, country)
             response = ask_user(country_counts, country, recs)
             if response == "R":
                 rejected_countries.add(country)
-                line = update_line_country(line, TOKEN)
+                update_row_country(row, TOKEN)
             if response == "A":
                 accepted_countries.add(country)
             if response == "M":
                 new_country = get_new_country_from_user(recs)
                 update_changes(changes, country, new_country)
                 accepted_countries.add(new_country)
-                line = update_line_country(line, new_country)
-            if response in ["A", "M"] or FILL_UNK:
-                dest_stream.write(line)
+                update_row_country(row, new_country)
+            if response in ["A", "M"] or not DROP_UNK:
+                writer.writerow(row)
 
-def get_country_counts(fname):
+def get_country_counts(stream, csv_reader):
     """
     Records the number of times each country appears in the dataset
     """
-    _ = fname.readline()
-
     country_counts = Counter()
-    for line in fname:
-        *_, country = extract_city_state_country(line)
+    for row in csv_reader:
+        country = extract_country_from_location(row["Location"])
         country_counts[country] += 1
-    fname.seek(0)
+
+    reset_stream(stream)
     return country_counts
+
+def reset_stream(stream):
+    stream.seek(0)
 
 def get_countries_above_max_threshold(counts):
     """
@@ -184,24 +174,16 @@ def get_countries_below_min_threshold(counts):
     """
     return set(k for k,v in counts.items() if v <= MIN_COUNT_THRESH)
 
-def apply_user_changes_to_line(changes, line):
-    *_, country = extract_city_state_country(line)
+def apply_user_changes_to_line(changes, row):
+    country = extract_country_from_location(row["Location"])
     if country in changes:
         new_country = changes[country]
-        return update_line_country(line, new_country)
-    else:
-        return line
+        update_row_country(row, new_country)
 
-def extract_city_state_country(line):
-    return line.split(";")[1].split(",")
-
-def update_line_country(line, new_country):
-    new_line = line.split(";")
-    location_data = new_line[1].split(",")
-    location_data[-1] = new_country
-    new_line[1] = ','.join(location_data)
-    new_line = ';'.join(new_line)
-    return new_line
+def update_row_country(row, new_country):
+    location = row["Location"].split(",")
+    location[-1] = new_country
+    row["Location"] = ','.join(location)
 
 def get_recommendations(corpus, word, n=3):
     """
@@ -281,7 +263,7 @@ def main():
          TemporaryFile('w+', encoding="utf8", dir=data_directory) as tmp,          \
          open(processed_data, 'w', encoding="utf8") as dest:
         clean_users(src, tmp)
-        tmp.seek(0)
+        reset_stream(tmp)
         clean_locations(tmp, dest)
 
 if __name__ == '__main__':
