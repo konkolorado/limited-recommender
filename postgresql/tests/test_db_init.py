@@ -4,6 +4,12 @@ import docker
 
 import os
 
+PGDATA="/var/lib/postgresql/data"
+PGLOCAL="/tmp/pgdata"
+
+if not os.path.exists(PGLOCAL):
+    os.makedirs(PGLOCAL)
+
 class TestInit(unittest.TestCase):
     def setUp(self):
         # Hush unittest socket warnings
@@ -13,7 +19,7 @@ class TestInit(unittest.TestCase):
         try:
             client.images.get("postgres:latest")
         except docker.errors.ImageNotFound:
-            self.fail("postgres image not found")
+            self.fail("postgres:latest image not found")
 
         self.containers = client.containers
         self.pg = self.containers.run("postgres:latest", detach=True,
@@ -22,6 +28,11 @@ class TestInit(unittest.TestCase):
                 docker.types.Mount(
                     target="/data",
                     source=os.path.abspath("../../data/"),
+                    type="bind", read_only=True
+                ),
+                docker.types.Mount(
+                    target=PGDATA,
+                    source=os.path.abspath(PGLOCAL),
                     type="bind", read_only=True
                 )
             ])
@@ -33,9 +44,9 @@ class TestInit(unittest.TestCase):
         self.assertTrue(self.container_found())
 
     def container_found(self):
-        found = True
         try:
             self.containers.get("postgres-tests")
+            found = True
         except docker.errors.NotFound:
             found = False
         return found
