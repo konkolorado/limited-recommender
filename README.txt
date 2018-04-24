@@ -1,18 +1,12 @@
-Deploying all tests in docker environment
-- ./deploy_tests.sh
-
-Running tests
-- Run all tests
-- $ python3.6 -m unittest discover
-
-- Run tests specific to a module
-- $ python3.6 -m unittest module.test_something
+# Running tests
+To run tests, cd to a directory that contains a "test[s]" directory and
+run nose2.  This will automatically discover unittests and run them
 
 
 # Postgresql
 The deploy_postgres script will mount the data source directory into the
 container and will persist the container data in the directory specified by
-PGDATA to the host's local directory specified by PGLOCAL 
+PGDATA to the host's local directory specified by PGLOCAL.
 
 Build the postgres image
 - cd postgres
