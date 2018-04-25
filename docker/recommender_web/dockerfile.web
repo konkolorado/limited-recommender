@@ -3,10 +3,16 @@ FROM python:3.6.3-slim
 WORKDIR /usr/src/app
 
 ADD requirements.txt .
+RUN pip install -r requirements.txt
+
 COPY . /usr/src/app
-COPY start_gunicorn.sh /start_gunicorn.sh
 
 EXPOSE 8000
 
-RUN pip install -r requirements.txt
-CMD ["/start_gunicorn.sh"]
+ENV DATABASE=postgres
+ENV DATABASE_USER=bookcrossing
+ENV DATABASE_PASSWORD=password
+ENV DATABASE_HOST=postgres
+ENV DATABASE_PORT=5432
+
+CMD ./start_web.sh
