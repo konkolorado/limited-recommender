@@ -1,0 +1,12 @@
+FROM python:3.6.3-slim
+
+WORKDIR /usr/src/app
+
+ADD requirements.txt .
+COPY . /usr/src/app
+COPY start_gunicorn.sh /start_gunicorn.sh
+
+EXPOSE 8000
+
+RUN pip install -r requirements.txt
+CMD ["/start_gunicorn.sh"]
