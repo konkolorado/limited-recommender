@@ -24,8 +24,8 @@ import user_interaction
 import file_checks
 
 data_directory = os.path.abspath("../data") + os.sep
-source_data = data_directory + "BX-Users-Cleansed.csv"
-processed_data = data_directory + "BX-Users-Cleansed-2.csv"
+source_data = data_directory + "BX-Users.csv"
+processed_data = data_directory + "BX-Users-Cleansed.csv"
 
 MAX_AGE = 100
 MIN_AGE = 10
