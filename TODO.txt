@@ -1,2 +1,5 @@
-- Restrcuture project
-  - where is the best place to put tests?
+- Docker compose file and location
+
+- Create django template and css
+- Figure out other containers necessary
+- Add Model code to django
