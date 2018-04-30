@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Apply any pending migartions
+python manage.py makemigrations
 python manage.py migrate --no-input
 
 # Start Gunicorn processes
