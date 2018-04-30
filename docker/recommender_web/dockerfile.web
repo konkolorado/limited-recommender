@@ -1,18 +1,21 @@
-FROM python:3.6.3-slim
+FROM python:3.6
 
 WORKDIR /usr/src/app
 
 ADD requirements.txt .
 RUN pip install -r requirements.txt
 
+# RUN THE BELOW WHEN YOU NEED TO RUN THE DJANGO DB SHELL
+RUN apt-get install -y wget &&  wget -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - && echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list && apt-get update && apt-get install -y postgresql-client-9.6
+
 COPY . /usr/src/app
 
-EXPOSE 8000
-
-ENV DATABASE=postgres
+ENV DATABASE=bookcrossing
 ENV DATABASE_USER=bookcrossing
 ENV DATABASE_PASSWORD=password
 ENV DATABASE_HOST=postgres
 ENV DATABASE_PORT=5432
 
+
+EXPOSE 8000
 CMD ./start_web.sh
