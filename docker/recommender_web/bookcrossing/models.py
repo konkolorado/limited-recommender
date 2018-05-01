@@ -19,7 +19,7 @@ class Book(models.Model):
 class User(models.Model):
     user_id = models.CharField(max_length=20)
     location = models.CharField(max_length=50)
-    age = models.PositiveSmallIntegerField()
+    age = models.CharField(max_length=3)
 
     def __str__(self):
         return f"User: {self.user_id} Location:{self.location} Age:{self.age}"
