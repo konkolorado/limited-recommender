@@ -16,6 +16,9 @@ ENV DATABASE_PASSWORD=password
 ENV DATABASE_HOST=postgres
 ENV DATABASE_PORT=5432
 
+ENV BOOKS=/data/BX-Books-Cleansed-Tini.csv
+ENV USERS=/data/BX-Users-Cleansed-Tini.csv
+ENV RATINGS=/data/BX-Book-Ratings-Cleansed-Tini.csv
 
 EXPOSE 8000
 CMD ./start_web.sh
