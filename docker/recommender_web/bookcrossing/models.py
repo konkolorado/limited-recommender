@@ -34,9 +34,11 @@ class Rating(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.PROTECT)
     isbn = models.ForeignKey(Book, on_delete=models.PROTECT)
     rating = models.PositiveSmallIntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Book {self.isbn}\tUser {self.user_id}: {self.rating}"
 
     class Meta:
-        ordering = ["isbn"]
+        ordering = ["user_id"]

@@ -32,11 +32,12 @@ class RatingSerializer(serializers.ModelSerializer):
         queryset=User.objects.all()
     )
     isbn = serializers.SlugRelatedField(
-        slug_field='title',
+        slug_field='isbn',
         required=True,
         queryset=Book.objects.all()
     )
 
     class Meta:
         model = Rating
-        fields = ("user_id", "isbn", "rating")
+        fields = ("user_id", "isbn", "rating", "created", "last_modified")
+        read_only_fields = ("created", "last_modified")
