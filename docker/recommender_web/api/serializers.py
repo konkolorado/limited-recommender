@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from bookcrossing.models import Book, User, Rating
+from rest_framework.validators import UniqueTogetherValidator
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -41,3 +42,11 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = ("user_id", "isbn", "rating", "created", "last_modified")
         read_only_fields = ("created", "last_modified")
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Rating.objects.all(),
+                fields=('user_id', 'isbn'),
+                message="Cannot create duplicate rating on a prexisting "
+                "user_id and isbn pair"
+            )
+        ]
