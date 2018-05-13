@@ -1,9 +1,9 @@
 - Docker compose file and location
-
 - Figure out other containers necessary
 - update web dockerfile to exclude docker build files from container
 - clear references to old python-slim image
 - looks like migrations arent applied unless postgres is 100% up already. look
 into delaying web startup (?)
-- add other models GET/ Post methods with tests
-- add pagination to the django GET / Post methods
+- replace unk values in API View with something more user friendly
+- add tests for creating and updating via api
+- add field len validators to serializers
