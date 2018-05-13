@@ -41,7 +41,7 @@ class ViewTestCase(TestCase):
             "image_url_l": "http://www.google.com",
         }
         self.response = self.client.post(
-            reverse('create'), self.new_book, format="json")
+            reverse('create_book'), self.new_book, format="json")
 
     def test_api_can_create_book(self):
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
