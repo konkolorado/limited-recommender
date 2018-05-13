@@ -9,7 +9,6 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to map serializer's fields with the model fields."""
         model = Book
-        fields = ("isbn", "title",
-                  "author", "publication_yr", "publisher",
-                  "image_url_s", "image_url_m", "image_url_l")
+        fields = ("title", "author", "publication_yr", "publisher",
+                  "isbn", "image_url_s", "image_url_m", "image_url_l")
         read_only_fields = ("id",)
