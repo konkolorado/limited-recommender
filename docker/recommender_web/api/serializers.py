@@ -1,11 +1,19 @@
 from rest_framework import serializers
 
 from bookcrossing.models import Book, User, Rating
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 
 class BookSerializer(serializers.ModelSerializer):
     """Serializer to map the Book model instance into JSON format."""
+    isbn = serializers.CharField(trim_whitespace=True,
+                                 validators=[
+                                     UniqueValidator(
+                                         queryset=Book.objects.all(),
+                                         message="Cannot create Book with "
+                                         "duplicate ISBN"
+                                     )
+                                 ])
 
     class Meta:
         """Meta class to map serializer's fields with the model fields."""
@@ -13,16 +21,22 @@ class BookSerializer(serializers.ModelSerializer):
         lookup_field = ("title", "author")
         fields = ("title", "author", "publication_yr", "publisher",
                   "isbn", "image_url_s", "image_url_m", "image_url_l")
-        read_only_fields = ("id",)
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer to map the User model instance into JSON format."""
+    user_id = serializers.CharField(trim_whitespace=True,
+                                    validators=[
+                                        UniqueValidator(
+                                            queryset=User.objects.all(),
+                                            message="Cannot create User with "
+                                            "duplicate user_id"
+                                        )
+                                    ])
 
     class Meta:
         model = User
         fields = ("user_id", "age", "location")
-        read_only_fields = ("id",)
 
 
 class RatingSerializer(serializers.ModelSerializer):
