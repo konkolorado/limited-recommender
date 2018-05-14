@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Book(models.Model):
@@ -33,7 +34,9 @@ class User(models.Model):
 class Rating(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.PROTECT)
     isbn = models.ForeignKey(Book, on_delete=models.PROTECT)
-    rating = models.PositiveSmallIntegerField()
+    rating = models.FloatField(
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
+    )
     created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
