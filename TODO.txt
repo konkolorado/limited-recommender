@@ -5,5 +5,3 @@
 - looks like migrations arent applied unless postgres is 100% up already. look
 into delaying web startup (?)
 - replace unk values in API View with something more user friendly
-- add tests for creating and updating via api
-- add field len validators to serializers
