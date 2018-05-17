@@ -3,34 +3,36 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 
+import json
+
 from bookcrossing.models import Book
 
 
 class BookTestCase(TestCase):
     def setUp(self):
-        self.new_book = {
+        self.book = {
             "isbn": "0",
             "title": "0",
             "author": "0",
             "publication_yr": "0",
             "publisher": "0",
-            "image_url_s": "0",
-            "image_url_m": "0",
-            "image_url_l": "0",
+            "image_url_s": "http://www.google.com",
+            "image_url_m": "http://www.google.com",
+            "image_url_l": "http://www.google.com",
         }
 
     def test_can_create_new_book(self):
         old_count = Book.objects.count()
-        Book(**self.new_book).save()
+        Book(**self.book).save()
         new_count = Book.objects.count()
         self.assertEqual(old_count + 1, new_count)
 
 
-class BookViewTestCase(TestCase):
+class BookViewPostTestCase(TestCase):
     def setUp(self):
         """Define the test client and other test variables."""
         self.client = APIClient()
-        self.new_book = {
+        self.book = {
             "isbn": "0",
             "title": "0",
             "author": "0",
@@ -42,27 +44,125 @@ class BookViewTestCase(TestCase):
         }
 
     def test_api_can_create_book(self):
-        self.response = self.client.post(
-            reverse('create_book'), self.new_book, format="json")
-        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+        response = self.client.post(
+            reverse('create_book'), self.book, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_api_cannot_create_duplicate_book(self):
-        self.client.post(reverse('create_book'), self.new_book, format="json")
-        self.response = self.client.post(reverse('create_book'),
-                                         self.new_book, format="json")
-        self.assertEqual(self.response.status_code,
+        self.client.post(reverse('create_book'), self.book, format="json")
+        response = self.client.post(reverse('create_book'),
+                                    self.book, format="json")
+        self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_book_with_invalid_url(self):
-        self.new_book["image_url_s"] = "nonsense_url"
-        self.response = self.client.post(reverse('create_book'),
-                                         self.new_book, format="json")
-        self.assertEqual(self.response.status_code,
+        self.book["image_url_s"] = "nonsense_url"
+        response = self.client.post(reverse('create_book'),
+                                    self.book, format="json")
+        self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_book_with_invalid_field_len(self):
-        self.new_book["isbn"] = "0" * 21
-        self.response = self.client.post(reverse('create_book'),
-                                         self.new_book, format="json")
-        self.assertEqual(self.response.status_code,
+        self.book["isbn"] = "0" * 21
+        response = self.client.post(reverse('create_book'),
+                                    self.book, format="json")
+        self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)
+
+
+class BookViewGetTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.book = {
+            "isbn": "0",
+            "title": "0",
+            "author": "0",
+            "publication_yr": "0",
+            "publisher": "0",
+            "image_url_s": "http://www.google.com",
+            "image_url_m": "http://www.google.com",
+            "image_url_l": "http://www.google.com",
+        }
+        Book(**self.book).save()
+
+    def test_api_can_get_book(self):
+        book = Book.objects.get()
+        response = self.client.get(
+            reverse('detail-book',
+                    kwargs={'isbn': book.isbn}), format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(json.loads(response.content), self.book)
+
+    def test_api_cannot_get_fake_book(self):
+        response = self.client.get(
+            reverse('detail-book',
+                    kwargs={'isbn': -1}), format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class BookViewPutTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.book = {
+            "isbn": "0",
+            "title": "0",
+            "author": "0",
+            "publication_yr": "0",
+            "publisher": "0",
+            "image_url_s": "http://www.google.com",
+            "image_url_m": "http://www.google.com",
+            "image_url_l": "http://www.google.com",
+        }
+        Book(**self.book).save()
+
+    def test_api_can_update_book(self):
+        self.book["title"] = -1
+        response = self.client.put(
+            reverse('detail-book', kwargs={'isbn': self.book["isbn"]}),
+            self.book, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_api_cannot_update_fake_book(self):
+        self.book["title"] = -1
+        response = self.client.put(
+            reverse('detail-book', kwargs={'isbn': self.book["isbn"] * 50}),
+            self.book, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_api_cannot_update_book_with_fake_data(self):
+        self.book["image_url_s"] = "0"
+        response = self.client.put(
+            reverse('detail-book', kwargs={'isbn': self.book["isbn"]}),
+            self.book, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class BookViewDeleteTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.book = {
+            "isbn": "0",
+            "title": "0",
+            "author": "0",
+            "publication_yr": "0",
+            "publisher": "0",
+            "image_url_s": "http://www.google.com",
+            "image_url_m": "http://www.google.com",
+            "image_url_l": "http://www.google.com",
+        }
+        Book(**self.book).save()
+
+    def test_api_can_delete_book(self):
+        response = self.client.delete(
+            reverse('detail-book', kwargs={'isbn': self.book["isbn"]}),
+            format='json', follow=True)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_api_cannot_delete_fake_book(self):
+        response = self.client.delete(
+            reverse('detail-book', kwargs={'isbn': self.book["isbn"] * 50}),
+            format='json', follow=True)
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -13,6 +13,13 @@ class CreateBookView(generics.ListCreateAPIView):
         serializer.save()
 
 
+class DetailBookView(generics.RetrieveUpdateDestroyAPIView):
+    """Handles the GET PUT and DELETE requests """
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    lookup_field = "isbn"
+
+
 class CreateUserView(generics.ListCreateAPIView):
     """ Defines the create behavior of the User Rest API """
     queryset = User.objects.all()
