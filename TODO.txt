@@ -4,3 +4,4 @@
 - looks like migrations arent applied unless postgres is 100% up already. look
 into delaying web startup (?)
 - replace unk values in API View with something more user friendly
+- add api tests for get put delete users and ratings
