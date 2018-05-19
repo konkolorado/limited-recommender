@@ -30,6 +30,13 @@ class CreateUserView(generics.ListCreateAPIView):
         serializer.save()
 
 
+class DetailUserView(generics.RetrieveUpdateDestroyAPIView):
+    """Handles the GET PUT and DELETE requests """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = "user_id"
+
+
 class CreateRatingView(generics.ListCreateAPIView):
     """ Defines the create behavior of the Rating Rest API """
     queryset = Rating.objects.all()
