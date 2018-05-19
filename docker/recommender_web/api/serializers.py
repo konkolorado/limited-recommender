@@ -49,18 +49,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RatingSerializer(serializers.HyperlinkedModelSerializer):
     """Serializer to map the Rating model instance into JSON format."""
-    # user_id = serializers.SlugRelatedField(
-    #    slug_field='user_id',
-    #    required=True,
-    #    queryset=User.objects.all()
-    # )
-    # isbn = serializers.SlugRelatedField(
-    #    slug_field='isbn',
-    #    required=True,
-    #    queryset=Book.objects.all()
-    # )
-    # isbn = serializers.HyperlinkedIdentityField(view_name='detail-book',
-    #                                            format='html')
 
     class Meta:
         model = Rating
@@ -75,6 +63,6 @@ class RatingSerializer(serializers.HyperlinkedModelSerializer):
             )
         ]
         extra_kwargs = {
-            'isbn': {'view_name': 'detail_book', 'lookup_field': 'isbn'},
-            'users': {'view_name': 'detail_user', 'lookup_field': 'user_id'}
+            'isbn': {'view_name': 'book-detail', 'lookup_field': 'isbn'},
+            'user_id': {'view_name': 'user-detail', 'lookup_field': 'user_id'},
         }
