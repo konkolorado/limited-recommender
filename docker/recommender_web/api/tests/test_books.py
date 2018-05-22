@@ -88,14 +88,14 @@ class BookViewGetTestCase(TestCase):
     def test_api_can_get_book(self):
         book = Book.objects.get()
         response = self.client.get(
-            reverse('detail-book',
+            reverse('book-detail',
                     kwargs={'isbn': book.isbn}), format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json.loads(response.content), self.book)
 
     def test_api_cannot_get_fake_book(self):
         response = self.client.get(
-            reverse('detail-book',
+            reverse('book-detail',
                     kwargs={'isbn': -1}), format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -118,7 +118,7 @@ class BookViewPutTestCase(TestCase):
     def test_api_can_update_book(self):
         self.book["title"] = -1
         response = self.client.put(
-            reverse('detail-book', kwargs={'isbn': self.book["isbn"]}),
+            reverse('book-detail', kwargs={'isbn': self.book["isbn"]}),
             self.book, format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -126,7 +126,7 @@ class BookViewPutTestCase(TestCase):
     def test_api_cannot_update_fake_book(self):
         self.book["title"] = -1
         response = self.client.put(
-            reverse('detail-book', kwargs={'isbn': self.book["isbn"] * 50}),
+            reverse('book-detail', kwargs={'isbn': self.book["isbn"] * 50}),
             self.book, format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -134,7 +134,7 @@ class BookViewPutTestCase(TestCase):
     def test_api_cannot_update_book_with_fake_data(self):
         self.book["image_url_s"] = "0"
         response = self.client.put(
-            reverse('detail-book', kwargs={'isbn': self.book["isbn"]}),
+            reverse('book-detail', kwargs={'isbn': self.book["isbn"]}),
             self.book, format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -157,12 +157,12 @@ class BookViewDeleteTestCase(TestCase):
 
     def test_api_can_delete_book(self):
         response = self.client.delete(
-            reverse('detail-book', kwargs={'isbn': self.book["isbn"]}),
+            reverse('book-detail', kwargs={'isbn': self.book["isbn"]}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_api_cannot_delete_fake_book(self):
         response = self.client.delete(
-            reverse('detail-book', kwargs={'isbn': self.book["isbn"] * 50}),
+            reverse('book-detail', kwargs={'isbn': self.book["isbn"] * 50}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)

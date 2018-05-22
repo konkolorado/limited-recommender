@@ -49,8 +49,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("user_id", "age", "location")
 
 
-class RatingSerializer(serializers.HyperlinkedModelSerializer):
+class RatingSerializer(serializers.ModelSerializer):
     """Serializer to map the Rating model instance into JSON format."""
+    user_id = serializers.SlugRelatedField(slug_field='user_id',
+                                           queryset=User.objects.all())
+    isbn = serializers.SlugRelatedField(slug_field='isbn',
+                                        queryset=Book.objects.all())
 
     isbn_url = HyperlinkedISBNIdentityField(view_name='book-detail',
                                             lookup_field="isbn")
@@ -59,8 +63,9 @@ class RatingSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Rating
-        fields = ("user_id", "isbn", "rating", "created", "last_modified",
-                  "user_id_url", "isbn_url")
+        fields = ("user_id", "isbn", "rating",
+                  "user_id_url", "isbn_url", "created", "last_modified")
+        # Hyper linked fields read only by default
         read_only_fields = ("created", "last_modified")
         validators = [
             UniqueTogetherValidator(
@@ -70,9 +75,3 @@ class RatingSerializer(serializers.HyperlinkedModelSerializer):
                 "user_id and isbn pair"
             )
         ]
-        extra_kwargs = {
-            'isbn': {'view_name': 'book-detail', 'lookup_field': 'isbn'},
-            'user_id': {'view_name': 'user-detail', 'lookup_field': 'user_id'},
-            'isbn_url': {'view_name': 'book-detail', 'lookup_field': 'isbn'},
-            'user_id_url': {'view_name': 'user-detail', 'lookup_field': 'user_id'},
-        }
