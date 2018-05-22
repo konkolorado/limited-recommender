@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from bookcrossing.models import Book, User, Rating
-from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+from api.custom_fields import (HyperlinkedUserIDIdentityField,
+                               HyperlinkedISBNIdentityField)
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -50,9 +52,15 @@ class UserSerializer(serializers.ModelSerializer):
 class RatingSerializer(serializers.HyperlinkedModelSerializer):
     """Serializer to map the Rating model instance into JSON format."""
 
+    isbn_url = HyperlinkedISBNIdentityField(view_name='book-detail',
+                                            lookup_field="isbn")
+    user_id_url = HyperlinkedUserIDIdentityField(view_name='user-detail',
+                                                 lookup_field="user_id")
+
     class Meta:
         model = Rating
-        fields = ("user_id", "isbn", "rating", "created", "last_modified")
+        fields = ("user_id", "isbn", "rating", "created", "last_modified",
+                  "user_id_url", "isbn_url")
         read_only_fields = ("created", "last_modified")
         validators = [
             UniqueTogetherValidator(
@@ -65,4 +73,6 @@ class RatingSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'isbn': {'view_name': 'book-detail', 'lookup_field': 'isbn'},
             'user_id': {'view_name': 'user-detail', 'lookup_field': 'user_id'},
+            'isbn_url': {'view_name': 'book-detail', 'lookup_field': 'isbn'},
+            'user_id_url': {'view_name': 'user-detail', 'lookup_field': 'user_id'},
         }
