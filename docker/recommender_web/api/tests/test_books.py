@@ -131,7 +131,7 @@ class BookViewPutTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_api_cannot_update_book_with_fake_data(self):
+    def test_api_cannot_update_book_with_bad_data(self):
         self.book["image_url_s"] = "0"
         response = self.client.put(
             reverse('book-detail', kwargs={'isbn': self.book["isbn"]}),
