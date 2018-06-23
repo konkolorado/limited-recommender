@@ -63,10 +63,11 @@ class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
-        fields = ("user_id", "isbn", "rating",
+        lookup_field = "id"
+        fields = ("id", "user_id", "isbn", "rating",
                   "user_id_url", "isbn_url", "created", "last_modified")
         # Hyper linked fields read only by default
-        read_only_fields = ("created", "last_modified")
+        read_only_fields = ("id", "created", "last_modified")
         validators = [
             UniqueTogetherValidator(
                 queryset=Rating.objects.all(),

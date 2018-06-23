@@ -14,7 +14,7 @@ class CreateBookView(generics.ListCreateAPIView):
 
 
 class DetailBookView(generics.RetrieveUpdateDestroyAPIView):
-    """Handles the GET PUT and DELETE requests """
+    """Handles the GET PUT and DELETE requests for Books"""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     lookup_field = "isbn"
@@ -31,7 +31,7 @@ class CreateUserView(generics.ListCreateAPIView):
 
 
 class DetailUserView(generics.RetrieveUpdateDestroyAPIView):
-    """Handles the GET PUT and DELETE requests """
+    """Handles the GET PUT and DELETE requests for Users"""
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = "user_id"
@@ -45,3 +45,12 @@ class CreateRatingView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """Save the post data when creating a new book."""
         serializer.save()
+
+
+class DetailRatingView(  # MultipleFieldLookupMixin,
+        generics.RetrieveUpdateDestroyAPIView):
+    """ Handles the GET PUT and DELETE requests for Ratings """
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+    lookup_field = "id"
+    lookup_url_kwarg = "rating_id"
