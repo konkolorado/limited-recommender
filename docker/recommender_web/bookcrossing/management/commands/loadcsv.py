@@ -4,6 +4,7 @@ from bookcrossing.models import User, Book, Rating
 import os
 import csv
 
+
 class Command(BaseCommand):
     help = 'Populates the database with initial data'
 
@@ -16,11 +17,11 @@ class Command(BaseCommand):
             help="users datafile to preload",
         )
         parser.add_argument(
-                '-books_csv',
-                action='store',
-                dest='books_csv',
-                default=None,
-                help="books datafile to preload",
+            '-books_csv',
+            action='store',
+            dest='books_csv',
+            default=None,
+            help="books datafile to preload",
         )
         parser.add_argument(
             '-ratings_csv',
@@ -49,17 +50,17 @@ class Command(BaseCommand):
     def commit_to_model(self, model, row):
         if model == User:
             _, new = User.objects.get_or_create(user_id=row["User-ID"],
-                location=row["Location"], age=row["Age"])
+                                                location=row["Location"], age=row["Age"])
         if model == Book:
             _, new = Book.objects.get_or_create(isbn=row["ISBN"],
-                title=row["Book-Title"],
-                author=row["Book-Author"],
-                publication_yr=row["Year-Of-Publication"],
-                publisher=row["Publisher"], image_url_s=row["Image-URL-S"],
-                image_url_m=row["Image-URL-M"], image_url_l=row["Image-URL-L"])
+                                                title=row["Book-Title"],
+                                                author=row["Book-Author"],
+                                                publication_yr=row["Year-Of-Publication"],
+                                                publisher=row["Publisher"], image_url_s=row["Image-URL-S"],
+                                                image_url_m=row["Image-URL-M"], image_url_l=row["Image-URL-L"])
         if model == Rating:
             _, new = Rating.objects.get_or_create(
-                user_id=User.objects.get(user_id = row["User-ID"]),
-                isbn=Book.objects.get(isbn = row["ISBN"]),
+                user_id=User.objects.get(user_id=row["User-ID"]),
+                isbn=Book.objects.get(isbn=row["ISBN"]),
                 rating=row["Book-Rating"])
         return new
