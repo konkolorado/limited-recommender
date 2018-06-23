@@ -41,7 +41,7 @@ class RatingTestCase(TestCase):
         self.assertEqual(old_count + 1, new_count)
 
 
-class RatingViewTestCase(TestCase):
+class RatingViewPostTestCase(TestCase):
     def setUp(self):
         """Define the test client and other test variables."""
         self.client = APIClient()
@@ -111,3 +111,40 @@ class RatingViewTestCase(TestCase):
                                          self.new_rating, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
+
+
+class RatingViewGetTestCase(TestCase):
+    def setUp(self):
+        """Define the test client and other test variables."""
+        self.client = APIClient()
+        self.create_demo_user_and_book()
+        self.new_rating = {
+            "user_id": "0",
+            "isbn": "0",
+            "rating": "5"
+        }
+
+    def create_demo_user_and_book(self):
+        self.new_book = {
+            "isbn": "0",
+            "title": "0",
+            "author": "0",
+            "publication_yr": "0",
+            "publisher": "0",
+            "image_url_s": "0",
+            "image_url_m": "0",
+            "image_url_l": "0",
+        }
+        self.new_user = {
+            "user_id": "0",
+            "location": "usa",
+            "age": "25"
+        }
+        Book(**self.new_book).save()
+        User(**self.new_user).save()
+
+    def test_api_can_get_rating(self):
+        pass
+
+    def test_api_cannot_get_fake_rating(self):
+        pass
