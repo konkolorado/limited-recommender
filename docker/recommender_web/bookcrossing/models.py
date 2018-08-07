@@ -28,7 +28,7 @@ class User(models.Model):
         return f"User: {self.user_id} Location:{self.location} Age:{self.age}"
 
     def __repr__(self):
-        return user_id
+        return self.user_id
 
     class Meta:
         ordering = ["user_id"]
