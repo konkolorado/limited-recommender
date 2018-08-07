@@ -1,6 +1,7 @@
 from rest_framework import generics
 from .serializers import BookSerializer, UserSerializer, RatingSerializer
 from bookcrossing.models import Book, User, Rating
+from .filters import RatingsFilterSet
 
 
 class CreateBookView(generics.ListCreateAPIView):
@@ -41,14 +42,14 @@ class CreateRatingView(generics.ListCreateAPIView):
     """ Defines the create behavior of the Rating Rest API """
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+    filter_class = RatingsFilterSet
 
     def perform_create(self, serializer):
         """Save the post data when creating a new book."""
         serializer.save()
 
 
-class DetailRatingView(  # MultipleFieldLookupMixin,
-        generics.RetrieveUpdateDestroyAPIView):
+class DetailRatingView(generics.RetrieveUpdateDestroyAPIView):
     """ Handles the GET PUT and DELETE requests for Ratings """
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
