@@ -117,14 +117,9 @@ class RatingViewGetTestCase(TestCase):
     def setUp(self):
         """Define the test client and other test variables."""
         self.client = APIClient()
-        self.create_demo_user_and_book()
-        self.new_rating = {
-            "user_id": "0",
-            "isbn": "0",
-            "rating": "5"
-        }
+        self.create_demo_user_book_rating()
 
-    def create_demo_user_and_book(self):
+    def create_demo_user_book_rating(self):
         self.new_book = {
             "isbn": "0",
             "title": "0",
@@ -142,9 +137,41 @@ class RatingViewGetTestCase(TestCase):
         }
         Book(**self.new_book).save()
         User(**self.new_user).save()
+        self.new_rating = {
+            "user_id": User.objects.get(user_id="0"),
+            "isbn": Book.objects.get(isbn="0"),
+            "rating": "5"
+        }
+        Rating(**self.new_rating).save()
 
-    def test_api_can_get_rating(self):
-        pass
+    def test_api_can_get_rating_by_user_id(self):
+        self.response = self.client.get(reverse('create_rating'),
+                                        {'user_id': '0'})
+        self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(self.response.data["results"]), 1)
 
-    def test_api_cannot_get_fake_rating(self):
-        pass
+    def test_api_can_get_rating_by_isbn(self):
+        self.response = self.client.get(reverse('create_rating'),
+                                        {'isbn': '0'})
+        self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(self.response.data["results"]), 1)
+
+    def test_api_can_get_rating_by_isbn_and_user_id(self):
+        self.response = self.client.get(reverse('create_rating'),
+                                        {'isbn': '0', 'user_id': '0'})
+        self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(self.response.data["results"]), 1)
+
+    def test_api_cannot_get_fake_rating_by_user_id(self):
+        self.response = self.client.get(reverse('create_rating'),
+                                        {'user_id': '-1'})
+        self.assertEqual(self.response.status_code,
+                         status.HTTP_200_OK)
+        self.assertEqual(len(self.response.data["results"]), 0)
+
+    def test_api_cannot_get_fake_rating_by_isbn(self):
+        self.response = self.client.get(reverse('create_rating'),
+                                        {'isbn': '-1'})
+        self.assertEqual(self.response.status_code,
+                         status.HTTP_200_OK)
+        self.assertEqual(len(self.response.data["results"]), 0)

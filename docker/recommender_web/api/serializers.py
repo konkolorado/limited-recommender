@@ -4,6 +4,7 @@ from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from bookcrossing.models import Book, User, Rating
 from api.custom_fields import (HyperlinkedUserIDIdentityField,
                                HyperlinkedISBNIdentityField)
+from api.fields import UserIDSlugRelatedField, ISBNSlugRelatedField
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -51,10 +52,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RatingSerializer(serializers.ModelSerializer):
     """Serializer to map the Rating model instance into JSON format."""
-    user_id = serializers.SlugRelatedField(slug_field='user_id',
-                                           queryset=User.objects.all())
-    isbn = serializers.SlugRelatedField(slug_field='isbn',
-                                        queryset=Book.objects.all())
+    user_id = UserIDSlugRelatedField(slug_field='user_id',
+                                     queryset=User.objects.all())
+    isbn = ISBNSlugRelatedField(slug_field='isbn',
+                                queryset=Book.objects.all())
 
     isbn_url = HyperlinkedISBNIdentityField(view_name='book-detail',
                                             lookup_field="isbn")
@@ -64,7 +65,7 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         lookup_field = "id"
-        fields = ("id", "user_id", "isbn", "rating",
+        fields = ("id", "user_id", "isbn",  "rating",
                   "user_id_url", "isbn_url", "created", "last_modified")
         # Hyper linked fields read only by default
         read_only_fields = ("id", "created", "last_modified")
@@ -73,6 +74,6 @@ class RatingSerializer(serializers.ModelSerializer):
                 queryset=Rating.objects.all(),
                 fields=('user_id', 'isbn'),
                 message="Cannot create duplicate rating on a prexisting "
-                "user_id and isbn pair"
+                "User ID and ISBN pair"
             )
         ]
