@@ -1,4 +1,4 @@
-PGLOCAL=/docker/pgdata
+PGLOCAL=/tmp/docker/pgdata
 PGDATA=/var/lib/postgresql/data
 mkdir -p $PGLOCAL
 
