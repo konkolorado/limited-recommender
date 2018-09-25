@@ -4,6 +4,7 @@ Helped function to plot data using matplotlib
 
 import matplotlib.pyplot as plt
 
+
 def plot_top_n(data_counts, title, xlabel, top=10):
     """
     Produces a matplotlib plot with the given title and xlabel

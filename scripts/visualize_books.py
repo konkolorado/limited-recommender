@@ -16,6 +16,7 @@ data_directory = os.path.abspath("../data") + os.sep
 source_data = data_directory + "BX-Book-Ratings-Cleansed.csv"
 TOKEN = "unk"
 
+
 def main():
     file_checks.assert_location_exists(data_directory)
     file_checks.assert_file_exists(source_data)
@@ -29,9 +30,10 @@ def main():
             count_user_ratings[row["User-ID"]] += 1
 
     plot_graph.plot_top_n(count_book_ratings, "Top books with most ratings",
-        "ISBNS")
+                          "ISBNS")
     plot_graph.plot_top_n(count_user_ratings, "Top users who rated",
-        "User ID")
+                          "User ID")
+
 
 if __name__ == "__main__":
     main()

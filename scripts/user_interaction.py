@@ -2,6 +2,7 @@
 Contains various methods for interacting with users.
 """
 
+
 def force_user_input(options, message=""):
     """
     Args

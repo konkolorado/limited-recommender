@@ -39,7 +39,7 @@ class BXDatasetTini(object):
         with open(self.books) as src, open(out_fname, 'w') as dst:
             reader = csv.DictReader(src, delimiter=';')
             writer = csv.DictWriter(dst, reader.fieldnames, delimiter=';',
-                quoting=csv.QUOTE_ALL)
+                                    quoting=csv.QUOTE_ALL)
 
             writer.writeheader()
             for i, line in enumerate(reader):
@@ -53,7 +53,7 @@ class BXDatasetTini(object):
         with open(self.users) as src, open(out_fname, 'w') as dst:
             reader = csv.DictReader(src, delimiter=';')
             writer = csv.DictWriter(dst, reader.fieldnames, delimiter=';',
-                quoting=csv.QUOTE_ALL)
+                                    quoting=csv.QUOTE_ALL)
 
             writer.writeheader()
             for i, line in enumerate(reader):
@@ -74,7 +74,7 @@ class BXDatasetTini(object):
         with open(self.ratings) as src, open(out_fname, 'w') as dst:
             reader = csv.DictReader(src, delimiter=';')
             writer = csv.DictWriter(dst, reader.fieldnames, delimiter=';',
-                quoting=csv.QUOTE_ALL)
+                                    quoting=csv.QUOTE_ALL)
 
             writer.writeheader()
             for i, line in enumerate(reader):
@@ -87,7 +87,7 @@ class BXDatasetTini(object):
     def _get_file_length(self, fname):
         with open(fname, 'r') as f:
             n_lines = sum(1 for line in f)
-        return n_lines - 1 # Remove header line
+        return n_lines - 1  # Remove header line
 
     def _sample(self, low, high, n):
         """
@@ -95,12 +95,14 @@ class BXDatasetTini(object):
         """
         return sorted(random.sample(range(low, high), n))
 
+
 def main():
     tini = BXDatasetTini(book_dataset, users_dataset, ratings_dataset)
 
     tini.make_tini_ratings(ratings_dataset_out, 10)
     tini.make_tini_books(book_dataset_out, 10)
     tini.make_tini_users(users_dataset_out, 10)
+
 
 if __name__ == '__main__':
     main()

@@ -29,15 +29,16 @@ processed_data = data_directory + "BX-Users-Cleansed.csv"
 
 MAX_AGE = 100
 MIN_AGE = 10
-MAX_COUNT_THRESH = 500000 # Locations appearing more than this are auto accepted
+MAX_COUNT_THRESH = 500000  # Locations appearing more than this are auto accepted
 MIN_COUNT_THRESH = 1  # Locations appearing less than this are auto rejected
 DROP_UNK = False      # Drop empty/null data or replace with a token
 TOKEN = "unk"
 
+
 def clean_users(src_stream, tmp_stream):
     reader = csv.DictReader(src_stream, delimiter=';')
     writer = csv.DictWriter(tmp_stream, reader.fieldnames, delimiter=";",
-        quoting=csv.QUOTE_ALL)
+                            quoting=csv.QUOTE_ALL)
     writer.writeheader()
 
     for row in reader:
@@ -57,14 +58,18 @@ def clean_users(src_stream, tmp_stream):
         process_data(row)
         writer.writerow(row)
 
+
 def missing_data(row):
     return len(row) != 3
+
 
 def missing_age(row):
     return row["Age"] in ["NULL", ""]
 
+
 def update_row_age(row, symbol):
     row["Age"] = symbol
+
 
 def missing_country_data(row):
     location = row["Location"]
@@ -72,16 +77,19 @@ def missing_country_data(row):
     if country.strip() in ["", " ", "n/a", "NULL"]:
         return True
 
+
 def extract_country_from_location(location):
     country = location.split(',')[-1]
     country = country.replace('"', '')
     return country
+
 
 def get_row_age(row):
     age = row["Age"]
     if age == TOKEN:
         return MAX_AGE - 1
     return int(age)
+
 
 def process_data(row):
     """
@@ -91,13 +99,16 @@ def process_data(row):
     lowercase(row)
     strip_whitespace(row)
 
+
 def lowercase(row):
     row["Location"] = row["Location"].lower()
+
 
 def strip_whitespace(row):
     location = row["Location"].split(",")
     stripped = [l.strip() for l in location]
     row["Location"] = ','.join(stripped)
+
 
 def clean_locations(tmp_stream, dest_stream):
     """
@@ -109,7 +120,7 @@ def clean_locations(tmp_stream, dest_stream):
     """
     reader = csv.DictReader(tmp_stream, delimiter=';')
     writer = csv.DictWriter(dest_stream, reader.fieldnames, delimiter=";",
-        quoting=csv.QUOTE_ALL)
+                            quoting=csv.QUOTE_ALL)
     writer.writeheader()
 
     country_counts = get_country_counts(tmp_stream, reader)
@@ -117,7 +128,7 @@ def clean_locations(tmp_stream, dest_stream):
     rejected_countries = get_countries_below_min_threshold(country_counts)
     changes = {}
 
-    tmp_stream.readline() # Gets DictReader to skip headerline
+    tmp_stream.readline()  # Gets DictReader to skip headerline
     for row in reader:
         apply_user_changes_to_line(changes, row)
         country = extract_country_from_location(row["Location"])
@@ -145,6 +156,7 @@ def clean_locations(tmp_stream, dest_stream):
             if response in ["A", "M"] or not DROP_UNK:
                 writer.writerow(row)
 
+
 def get_country_counts(stream, csv_reader):
     """
     Records the number of times each country appears in the dataset
@@ -157,22 +169,26 @@ def get_country_counts(stream, csv_reader):
     reset_stream(stream)
     return country_counts
 
+
 def reset_stream(stream):
     stream.seek(0)
+
 
 def get_countries_above_max_threshold(counts):
     """
     Creates a set of countries that have come up more than
     MAX_COUNT_THRESH times
     """
-    return set(k for k,v in counts.items() if v >= MAX_COUNT_THRESH)
+    return set(k for k, v in counts.items() if v >= MAX_COUNT_THRESH)
+
 
 def get_countries_below_min_threshold(counts):
     """
     Creates a set of countries that have come up less than
     MIN_COUNT_THRESH times. This signals they are automatically rejected
     """
-    return set(k for k,v in counts.items() if v <= MIN_COUNT_THRESH)
+    return set(k for k, v in counts.items() if v <= MIN_COUNT_THRESH)
+
 
 def apply_user_changes_to_line(changes, row):
     country = extract_country_from_location(row["Location"])
@@ -180,10 +196,12 @@ def apply_user_changes_to_line(changes, row):
         new_country = changes[country]
         update_row_country(row, new_country)
 
+
 def update_row_country(row, new_country):
     location = row["Location"].split(",")
     location[-1] = new_country
     row["Location"] = ','.join(location)
+
 
 def get_recommendations(corpus, word, n=3):
     """
@@ -191,17 +209,19 @@ def get_recommendations(corpus, word, n=3):
     """
     return get_close_matches(word, corpus, n=n)
 
+
 def ask_user(country_counts, country, suggestions):
     message = "Accept? Reject? Modify? See suggestions?"
     recs_message = build_recs_message(suggestions)
 
     print(f"Country Counts '{country}': {country_counts[country]}")
     response = user_interaction.force_user_input(["A", "R", "M", "S"],
-                                                message)
+                                                 message)
     while response == "S":
         response = user_interaction.force_user_input(["A", "R", "M", "S"],
-                                                    recs_message)
+                                                     recs_message)
     return response
+
 
 def build_recs_message(recs):
     if len(recs) == 0:
@@ -210,6 +230,7 @@ def build_recs_message(recs):
         s = ''.join(f"{num}. {rec} " for num, rec in enumerate(recs, 1))
         s = "Suggestions: " + s
     return s
+
 
 def get_new_country_from_user(suggestions):
     """
@@ -235,8 +256,10 @@ def get_new_country_from_user(suggestions):
                 break
     return country
 
+
 def update_changes(all_changes, old, new):
     all_changes[old] = new
+
 
 def do_file_checks(datadir, srcdata, procdata):
     """
@@ -251,20 +274,22 @@ def do_file_checks(datadir, srcdata, procdata):
         file_checks.assert_file_not_exists(procdata)
     except AssertionError:
         message = f"File {procdata} already exists. If you proceed it " \
-        "will be overwritten. Continue anyways?"
+            "will be overwritten. Continue anyways?"
         response = user_interaction.force_user_input(["Y", "n"], message)
         if response == "n":
             raise SystemExit()
+
 
 def main():
     do_file_checks(data_directory, source_data, processed_data)
 
     with open(source_data, 'r', encoding="iso-8859-1") as src, \
-         TemporaryFile('w+', encoding="utf8", dir=data_directory) as tmp,          \
-         open(processed_data, 'w', encoding="utf8") as dest:
+            TemporaryFile('w+', encoding="utf8", dir=data_directory) as tmp,          \
+            open(processed_data, 'w', encoding="utf8") as dest:
         clean_users(src, tmp)
         reset_stream(tmp)
         clean_locations(tmp, dest)
+
 
 if __name__ == '__main__':
     main()
