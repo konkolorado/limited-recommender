@@ -1,6 +1,7 @@
 # Running tests
 To run tests, cd to a directory that contains a "test[s]" directory and
 run nose2.  This will automatically discover unittests and run them
+This is a test
 
 
 # Postgresql
