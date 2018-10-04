@@ -1,0 +1,26 @@
+---
+# tasks file for image_build
+- name: Build the postgresql image
+  docker_image:
+    name: postgres:9.6-alpine
+  notify: clean images
+
+- name: Stage the requirements file for the web image
+  copy:
+    src: ../requirements/requirements.txt
+    dest: "{{ role_path }}/files"
+  notify: unstage
+
+- name: Stage the source code for the web image
+  synchronize:
+    src: ../recommendersystem/web
+    dest: "{{ role_path }}/files"
+  notify: unstage
+
+- name: Build the limited recommender system web image
+  docker_image:
+    name: recommender_web
+    path: "{{ role_path }}/files"
+    dockerfile: Dockerfile.web
+    force: yes
+  notify: clean images

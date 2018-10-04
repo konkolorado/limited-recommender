@@ -1,0 +1,20 @@
+---
+# handlers file for image_build
+- name: Unstage requirements.txt
+  file:
+    state: absent
+    path: "{{ role_path }}/files/requirements.txt"
+  listen: unstage
+
+- name: Unstage source code
+  file:
+    state: absent
+    path: "{{ role_path }}/files/web"
+  listen: unstage
+
+- name: Remove any dangling images
+  shell: docker rmi $(docker images -f dangling=true -q)
+  register: rm_dangling
+  changed_when: "'Deleted' in rm_dangling.stdout"
+  failed_when: False
+  listen: clean images

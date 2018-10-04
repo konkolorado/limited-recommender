@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 
 # Apply any pending migrations
 python manage.py makemigrations

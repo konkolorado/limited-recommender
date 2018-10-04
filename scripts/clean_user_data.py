@@ -29,7 +29,7 @@ processed_data = data_directory + "BX-Users-Cleansed.csv"
 
 MAX_AGE = 100
 MIN_AGE = 10
-MAX_COUNT_THRESH = 500000  # Locations appearing more than this are auto accepted
+MAX_COUNT_THRESH = 10000  # Locations appearing more than this are auto accepted
 MIN_COUNT_THRESH = 1  # Locations appearing less than this are auto rejected
 DROP_UNK = False      # Drop empty/null data or replace with a token
 TOKEN = "unk"
