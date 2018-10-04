@@ -2,6 +2,7 @@
 - name: Build and deploy the limited recommender system
   hosts: localhost
   gather_facts: false
+  force_handlers: true
   roles:
     - { role: image_build }
     - { role: docker_deploy }
