@@ -9,7 +9,7 @@ class HyperlinkedUserIDIdentityField(HyperlinkedIdentityField):
     """
 
     def get_url(self, obj, view_name, request, format):
-        kwargs = {self.lookup_url_kwarg: obj.user_id.user_id}
+        kwargs = {self.lookup_url_kwarg: obj.user_id.pk}
         return self.reverse(view_name, kwargs=kwargs,
                             request=request, format=format)
 
@@ -21,6 +21,6 @@ class HyperlinkedISBNIdentityField(HyperlinkedIdentityField):
     """
 
     def get_url(self, obj, view_name, request, format):
-        kwargs = {self.lookup_url_kwarg: obj.isbn.isbn}
+        kwargs = {self.lookup_url_kwarg: obj.isbn.pk}
         return self.reverse(view_name, kwargs=kwargs,
                             request=request, format=format)

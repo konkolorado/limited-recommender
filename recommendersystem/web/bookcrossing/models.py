@@ -16,7 +16,7 @@ class Book(models.Model):
         return f"{self.title} by {self.author}, {self.publication_yr}"
 
     class Meta:
-        ordering = ["title"]
+        ordering = ["pk"]
 
 
 class User(models.Model):
@@ -31,7 +31,7 @@ class User(models.Model):
         return self.user_id
 
     class Meta:
-        ordering = ["user_id"]
+        ordering = ["pk"]
 
 
 class Rating(models.Model):
@@ -47,4 +47,4 @@ class Rating(models.Model):
         return f"Book {self.isbn}\tUser {self.user_id}: {self.rating}"
 
     class Meta:
-        ordering = ["user_id"]
+        ordering = ["pk"]

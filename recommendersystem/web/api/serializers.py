@@ -22,12 +22,13 @@ class BookSerializer(serializers.ModelSerializer):
     author = serializers.CharField(trim_whitespace=True, max_length=100)
     publication_yr = serializers.CharField(trim_whitespace=True, max_length=10)
     publisher = serializers.CharField(trim_whitespace=True, max_length=50)
+    id = serializers.IntegerField(source="pk", read_only=True)
 
     class Meta:
         """Meta class to map serializer's fields with the model fields."""
         model = Book
         lookup_field = ("title", "author")
-        fields = ("title", "author", "publication_yr", "publisher",
+        fields = ("id", "title", "author", "publication_yr", "publisher",
                   "isbn", "image_url_s", "image_url_m", "image_url_l")
 
 
@@ -44,10 +45,11 @@ class UserSerializer(serializers.ModelSerializer):
                                     ])
     location = serializers.CharField(trim_whitespace=True, max_length=50)
     age = serializers.CharField(trim_whitespace=True, max_length=3)
+    id = serializers.IntegerField(source="pk", read_only=True)
 
     class Meta:
         model = User
-        fields = ("user_id", "age", "location")
+        fields = ("id", "user_id", "age", "location")
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -58,17 +60,19 @@ class RatingSerializer(serializers.ModelSerializer):
                                 queryset=Book.objects.all())
 
     isbn_url = HyperlinkedISBNIdentityField(view_name='book-detail',
-                                            lookup_field="isbn")
+                                            lookup_field="pk")
     user_id_url = HyperlinkedUserIDIdentityField(view_name='user-detail',
-                                                 lookup_field="user_id")
+                                                 lookup_field="pk")
+    id = serializers.IntegerField(source="pk", read_only=True)
 
     class Meta:
         model = Rating
         lookup_field = "id"
+
+        # Hyper linked fields read only by default
         fields = ("id", "user_id", "isbn",  "rating",
                   "user_id_url", "isbn_url", "created", "last_modified")
-        # Hyper linked fields read only by default
-        read_only_fields = ("id", "created", "last_modified")
+
         validators = [
             UniqueTogetherValidator(
                 queryset=Rating.objects.all(),
