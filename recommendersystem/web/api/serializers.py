@@ -27,7 +27,6 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to map serializer's fields with the model fields."""
         model = Book
-        lookup_field = ("title", "author")
         fields = ("id", "title", "author", "publication_yr", "publisher",
                   "isbn", "image_url_s", "image_url_m", "image_url_l")
 
@@ -67,7 +66,6 @@ class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
-        lookup_field = "id"
 
         # Hyper linked fields read only by default
         fields = ("id", "user_id", "isbn",  "rating",
