@@ -1,3 +1,2 @@
 - Docker compose file and location
 - Figure out other containers necessary
-- make urls relative in api view
