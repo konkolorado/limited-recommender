@@ -1,4 +1,3 @@
 - Docker compose file and location
 - Figure out other containers necessary
-- add api tests for get put delete users and ratings
 - make urls relative in api view

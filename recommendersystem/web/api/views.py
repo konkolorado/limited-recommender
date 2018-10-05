@@ -1,4 +1,10 @@
+from collections import OrderedDict
+
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.reverse import _reverse
+
 from .serializers import BookSerializer, UserSerializer, RatingSerializer
 from bookcrossing.models import Book, User, Rating
 from .filters import RatingFilterSet, UserFilterSet, BookFilterSet
@@ -58,3 +64,27 @@ class DetailRatingView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
     lookup_field = "pk"
+
+
+class ApiRootView(APIView):
+    view_name = ('REST API')
+
+    def get(self, request, format=None):
+        ''' List supported API versions '''
+
+        v1 = _reverse('api_v1_root_view', request=request)
+        data = OrderedDict()
+        data['description'] = ('Limited Recommender System REST API')
+        data['current_version'] = v1
+        data['available_versions'] = dict(v1=v1)
+        return Response(data)
+
+
+class ApiV1RootView(APIView):
+    def get(self, request, format=None):
+        ''' List top level resources '''
+        data = OrderedDict()
+        data['books'] = _reverse('book-create', request=request)
+        data['users'] = _reverse('user-create', request=request)
+        data['ratings'] = _reverse('rating-create', request=request)
+        return Response(data)
