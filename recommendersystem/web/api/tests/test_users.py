@@ -58,6 +58,7 @@ class UserViewGetTestCase(TestCase):
         """Define the test client and other test variables."""
         self.client = APIClient()
         self.new_user = {
+            "id": 1,
             "user_id": "0",
             "location": "usa",
             "age": "25"
@@ -68,14 +69,14 @@ class UserViewGetTestCase(TestCase):
         user = User.objects.get()
         response = self.client.get(
             reverse('user-detail',
-                    kwargs={'user_id': user.user_id}), format="json")
+                    kwargs={'pk': user.pk}), format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json.loads(response.content), self.new_user)
 
     def test_api_cannot_get_fake_user(self):
         response = self.client.get(
             reverse('user-detail',
-                    kwargs={'user_id': -1}), format="json")
+                    kwargs={'pk': -1}), format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -83,6 +84,7 @@ class UserViewPutTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.new_user = {
+            "id": "1",
             "user_id": "0",
             "location": "usa",
             "age": "25"
@@ -92,8 +94,8 @@ class UserViewPutTestCase(TestCase):
     def test_api_can_update_user(self):
         self.new_user["location"] = "blah"
         response = self.client.put(
-            reverse('user-detail', kwargs={'user_id':
-                                           self.new_user["user_id"]}),
+            reverse('user-detail', kwargs={'pk':
+                                           self.new_user["id"]}),
             self.new_user, format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -101,8 +103,8 @@ class UserViewPutTestCase(TestCase):
     def test_api_cannot_update_fake_user(self):
         self.new_user["age"] = 0
         response = self.client.put(
-            reverse('user-detail', kwargs={'user_id':
-                                           self.new_user["user_id"] * 50}),
+            reverse('user-detail', kwargs={'pk':
+                                           self.new_user["id"] * 50}),
             self.new_user, format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -110,8 +112,8 @@ class UserViewPutTestCase(TestCase):
     def test_api_cannot_update_user_with_bad_data(self):
         self.new_user["age"] = 1000
         response = self.client.put(
-            reverse('user-detail', kwargs={'user_id':
-                                           self.new_user["user_id"]}),
+            reverse('user-detail', kwargs={'pk':
+                                           self.new_user["id"]}),
             self.new_user, format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -121,6 +123,7 @@ class UserViewDeleteTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.new_user = {
+            "id": "1",
             "user_id": "0",
             "location": "usa",
             "age": "25"
@@ -129,14 +132,14 @@ class UserViewDeleteTestCase(TestCase):
 
     def test_api_can_delete_user(self):
         response = self.client.delete(
-            reverse("user-detail", kwargs={'user_id':
-                                           self.new_user["user_id"]}),
+            reverse("user-detail", kwargs={'pk':
+                                           self.new_user["id"]}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_api_cannot_delete_fake_user(self):
         response = self.client.delete(
-            reverse('user-detail', kwargs={'user_id':
-                                           self.new_user["user_id"] * 50}),
+            reverse('user-detail', kwargs={'pk':
+                                           self.new_user["id"] * 50}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
