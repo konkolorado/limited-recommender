@@ -37,7 +37,7 @@ class User(models.Model):
 class Rating(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.PROTECT)
     isbn = models.ForeignKey(Book, on_delete=models.PROTECT)
-    rating = models.FloatField(
+    rating = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(10)],
     )
     created = models.DateTimeField(auto_now_add=True)
