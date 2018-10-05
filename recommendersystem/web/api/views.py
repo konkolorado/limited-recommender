@@ -58,4 +58,3 @@ class DetailRatingView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
     lookup_field = "pk"
-    # lookup_url_kwarg = "rating_id"
