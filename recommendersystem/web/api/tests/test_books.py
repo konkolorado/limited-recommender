@@ -45,26 +45,26 @@ class BookViewPostTestCase(TestCase):
 
     def test_api_can_create_book(self):
         response = self.client.post(
-            reverse('create_book'), self.book, format="json")
+            reverse('book-create'), self.book, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_api_cannot_create_duplicate_book(self):
-        self.client.post(reverse('create_book'), self.book, format="json")
-        response = self.client.post(reverse('create_book'),
+        self.client.post(reverse('book-create'), self.book, format="json")
+        response = self.client.post(reverse('book-create'),
                                     self.book, format="json")
         self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_book_with_invalid_url(self):
         self.book["image_url_s"] = "nonsense_url"
-        response = self.client.post(reverse('create_book'),
+        response = self.client.post(reverse('book-create'),
                                     self.book, format="json")
         self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_book_with_invalid_field_len(self):
         self.book["isbn"] = "0" * 21
-        response = self.client.post(reverse('create_book'),
+        response = self.client.post(reverse('book-create'),
                                     self.book, format="json")
         self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)
