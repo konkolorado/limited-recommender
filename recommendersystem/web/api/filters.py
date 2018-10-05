@@ -1,9 +1,8 @@
 import django_filters
-from django_filters import FilterSet
 from bookcrossing.models import Rating, User, Book
 
 
-class RatingFilterSet(FilterSet):
+class RatingFilterSet(django_filters.FilterSet):
     """
     Custom filter makes query params look better. Instead of
     submitting a request with the url as:
@@ -15,13 +14,14 @@ class RatingFilterSet(FilterSet):
                                      label="ISBN")
     user_id = django_filters.CharFilter(field_name='user_id__user_id',
                                         label="User ID")
+    rating = django_filters.NumberFilter(field_name="rating", label="Rating")
 
     class Meta:
         model = Rating
-        fields = ['isbn', 'user_id']
+        fields = ['isbn', 'user_id', 'rating']
 
 
-class UserFilterSet(FilterSet):
+class UserFilterSet(django_filters.FilterSet):
     user_id = django_filters.CharFilter(field_name='user_id',
                                         label="User ID")
     location = django_filters.CharFilter(field_name='location',
@@ -35,7 +35,7 @@ class UserFilterSet(FilterSet):
         fields = ['user_id', 'location', 'age']
 
 
-class BookFilterSet(FilterSet):
+class BookFilterSet(django_filters.FilterSet):
     isbn = django_filters.CharFilter(field_name='isbn',
                                      label="ISBN")
     title = django_filters.CharFilter(field_name='title',
