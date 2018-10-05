@@ -256,3 +256,48 @@ class RatingViewPutTestCase(TestCase):
             {"rating": 11}, format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class RatingViewDeleteTestCase(TestCase):
+    def setUp(self):
+        """Define the test client and other test variables."""
+        self.client = APIClient()
+        self.create_demo_user_book_rating()
+
+    def create_demo_user_book_rating(self):
+        self.new_book = {
+            "isbn": "0",
+            "title": "0",
+            "author": "0",
+            "publication_yr": "0",
+            "publisher": "0",
+            "image_url_s": "0",
+            "image_url_m": "0",
+            "image_url_l": "0",
+        }
+        self.new_user = {
+            "user_id": "0",
+            "location": "usa",
+            "age": "25"
+        }
+        Book(**self.new_book).save()
+        User(**self.new_user).save()
+        self.new_rating = {
+            "id": 1,
+            "user_id": User.objects.get(user_id="0"),
+            "isbn": Book.objects.get(isbn="0"),
+            "rating": "5"
+        }
+        Rating(**self.new_rating).save()
+
+    def test_api_can_delete_rating(self):
+        response = self.client.delete(
+            reverse('rating-detail', kwargs={'pk': self.new_rating["id"]}),
+            format='json', follow=True)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_api_cannot_delete_fake_rating(self):
+        response = self.client.delete(
+            reverse('rating-detail', kwargs={'pk': self.new_rating["id"]*50}),
+            format='json', follow=True)
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
