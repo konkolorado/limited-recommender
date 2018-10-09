@@ -13,7 +13,7 @@ class Book(models.Model):
     image_url_l = models.URLField()
 
     def __str__(self):
-        return f"{self.title} by {self.author}, {self.publication_yr}"
+        return f'"{self.title}" by {self.author}'
 
     class Meta:
         ordering = ["pk"]
@@ -25,7 +25,8 @@ class User(models.Model):
     age = models.CharField(max_length=3)
 
     def __str__(self):
-        return f"User: {self.user_id} Location:{self.location} Age:{self.age}"
+        location = self.location.split(",")[-1].upper()
+        return f"User: {self.user_id} Location: {location}\tAge:{self.age}"
 
     def __repr__(self):
         return self.user_id
@@ -44,7 +45,7 @@ class Rating(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Book {self.isbn}\tUser {self.user_id}: {self.rating}"
+        return f"Book {self.isbn} User {self.user_id}: {self.rating}"
 
     class Meta:
         ordering = ["pk"]
