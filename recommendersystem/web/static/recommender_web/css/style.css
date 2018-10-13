@@ -1,9 +1,1 @@
-
-// Need this format for .modelcontainer styles to display properly
-.modelcontainer {
-    display: flex;
-}
-
-.modelcontainer > div {
-    flex: auto; /*grow*/
-}
+// Put styles here
