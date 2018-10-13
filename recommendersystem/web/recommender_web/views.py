@@ -1,10 +1,8 @@
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render
 from django.core.paginator import Paginator
 
 
 from bookcrossing.models import Book, User, Rating
-
-import sys
 
 
 def index(request):
