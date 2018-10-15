@@ -17,6 +17,6 @@ python manage.py test
 
 # Start Gunicorn processes
 echo Starting Gunicorn.
-exec gunicorn recommender_web.wsgi:application \
+exec gunicorn recommender.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers 3
