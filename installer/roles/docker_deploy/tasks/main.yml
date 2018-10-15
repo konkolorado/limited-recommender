@@ -40,3 +40,4 @@
       BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
       USERS: "/data/BX-Users-Cleansed-Tini.csv"
       RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
+      SECRET_KEY: "{{ secret_key }}"
