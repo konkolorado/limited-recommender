@@ -26,7 +26,7 @@
     name: limited_recommender
     image: limited_recommender
     ports:
-      - "8000:8000"
+      - "80:80"
     volumes:
       - ../data/:/data:ro
     links:
