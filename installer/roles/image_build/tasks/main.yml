@@ -5,22 +5,22 @@
     name: postgres:9.6-alpine
   notify: clean images
 
-- name: Stage the requirements file for the web image
+- name: Stage the requirements file for the limited recommender image
   copy:
     src: ../requirements/requirements.txt
     dest: "{{ role_path }}/files"
   notify: unstage
 
-- name: Stage the source code for the web image
+- name: Stage the source code for the limited recommender image
   synchronize:
     src: ../recommendersystem/web
     dest: "{{ role_path }}/files"
   notify: unstage
 
-- name: Build the limited recommender system web image
+- name: Build the limited recommender system image
   docker_image:
-    name: recommender_web
+    name: limited_recommender
     path: "{{ role_path }}/files"
-    dockerfile: Dockerfile.web
+    dockerfile: Dockerfile
     force: yes
   notify: clean images

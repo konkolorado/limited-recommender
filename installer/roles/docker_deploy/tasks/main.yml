@@ -23,8 +23,8 @@
 
 - name: Deploy the limited recommender system web container
   docker_container:
-    name: recommender_web
-    image: recommender_web
+    name: limited_recommender
+    image: limited_recommender
     ports:
       - "8000:8000"
     volumes:
