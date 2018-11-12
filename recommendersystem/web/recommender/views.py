@@ -3,8 +3,9 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 
-
 from bookcrossing.models import Book, User, Rating
+
+PAGE_ITEMS = 5
 
 
 class IndexView(View):
@@ -12,17 +13,17 @@ class IndexView(View):
 
     def get(self, request):
         books = Book.objects.all()
-        books_paginator = Paginator(books, 3)
+        books_paginator = Paginator(books, PAGE_ITEMS)
         book_request_page = request.GET.get('book_page')
         book_page = books_paginator.get_page(book_request_page)
 
         ratings = Rating.objects.all()
-        ratings_pagintor = Paginator(ratings, 5)
+        ratings_pagintor = Paginator(ratings, PAGE_ITEMS)
         rating_request_page = request.GET.get('rating_page')
         rating_page = ratings_pagintor.get_page(rating_request_page)
 
         users = User.objects.all()
-        users_paginator = Paginator(users, 5)
+        users_paginator = Paginator(users, PAGE_ITEMS)
         user_request_page = request.GET.get('user_page')
         user_page = users_paginator.get_page(user_request_page)
 
