@@ -73,41 +73,41 @@ class RatingViewPostTestCase(TestCase):
 
     def test_api_can_create_rating(self):
         self.response = self.client.post(
-            reverse('rating-create'), self.new_rating, format="json")
+            reverse('api-rating-create'), self.new_rating, format="json")
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
 
     def test_api_cannot_create_duplicate_rating(self):
-        self.client.post(reverse('rating-create'), self.new_rating,
+        self.client.post(reverse('api-rating-create'), self.new_rating,
                          format="json")
-        self.response = self.client.post(reverse('rating-create'),
+        self.response = self.client.post(reverse('api-rating-create'),
                                          self.new_rating, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_rating_with_invalid_user_id(self):
         self.new_rating["user_id"] = "1"
-        self.response = self.client.post(reverse('rating-create'),
+        self.response = self.client.post(reverse('api-rating-create'),
                                          self.new_rating, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_rating_with_invalid_isbn(self):
         self.new_rating["isbn"] = "1"
-        self.response = self.client.post(reverse('rating-create'),
+        self.response = self.client.post(reverse('api-rating-create'),
                                          self.new_rating, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_rating_with_negative_rating(self):
         self.new_rating["rating"] = "-1"
-        self.response = self.client.post(reverse('rating-create'),
+        self.response = self.client.post(reverse('api-rating-create'),
                                          self.new_rating, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_rating_with_rating_over_ten(self):
         self.new_rating["rating"] = "11"
-        self.response = self.client.post(reverse('rating-create'),
+        self.response = self.client.post(reverse('api-rating-create'),
                                          self.new_rating, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
@@ -145,46 +145,46 @@ class RatingViewGetTestCase(TestCase):
         Rating(**self.new_rating).save()
 
     def test_api_can_get_rating_by_user_id(self):
-        self.response = self.client.get(reverse('rating-create'),
+        self.response = self.client.get(reverse('api-rating-create'),
                                         {'user_id': '0'})
         self.assertEqual(self.response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(self.response.data["results"]), 1)
 
     def test_api_can_get_rating_by_isbn(self):
-        self.response = self.client.get(reverse('rating-create'),
+        self.response = self.client.get(reverse('api-rating-create'),
                                         {'isbn': '0'})
         self.assertEqual(self.response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(self.response.data["results"]), 1)
 
     def test_api_can_get_rating_by_rating(self):
-        self.response = self.client.get(reverse('rating-create'),
+        self.response = self.client.get(reverse('api-rating-create'),
                                         {'rating': '5'})
         self.assertEqual(self.response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(self.response.data["results"]), 1)
 
     def test_api_can_get_rating_by_isbn_and_user_id_and_rating(self):
-        self.response = self.client.get(reverse('rating-create'),
+        self.response = self.client.get(reverse('api-rating-create'),
                                         {'isbn': '0', 'user_id': '0',
                                          'rating': '5'})
         self.assertEqual(self.response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(self.response.data["results"]), 1)
 
     def test_api_cannot_get_fake_rating_by_user_id(self):
-        self.response = self.client.get(reverse('rating-create'),
+        self.response = self.client.get(reverse('api-rating-create'),
                                         {'user_id': '-1'})
         self.assertEqual(self.response.status_code,
                          status.HTTP_200_OK)
         self.assertEqual(len(self.response.data["results"]), 0)
 
     def test_api_cannot_get_fake_rating_by_isbn(self):
-        self.response = self.client.get(reverse('rating-create'),
+        self.response = self.client.get(reverse('api-rating-create'),
                                         {'isbn': '-1'})
         self.assertEqual(self.response.status_code,
                          status.HTTP_200_OK)
         self.assertEqual(len(self.response.data["results"]), 0)
 
     def test_api_cannot_get_fake_rating_by_rating(self):
-        self.response = self.client.get(reverse('rating-create'),
+        self.response = self.client.get(reverse('api-rating-create'),
                                         {'rating': '1'})
         self.assertEqual(self.response.status_code,
                          status.HTTP_200_OK)
@@ -225,7 +225,7 @@ class RatingViewPutTestCase(TestCase):
 
     def test_api_can_update_rating(self):
         response = self.client.put(
-            reverse('rating-detail', kwargs={'pk':
+            reverse('api-rating-detail', kwargs={'pk':
                                              self.new_rating["id"]
                                              }),
             {
@@ -238,7 +238,7 @@ class RatingViewPutTestCase(TestCase):
 
     def test_api_cannot_update_fake_rating(self):
         response = self.client.put(
-            reverse('rating-detail', kwargs={'pk':
+            reverse('api-rating-detail', kwargs={'pk':
                                              self.new_rating["id"] * 50
                                              }),
             {
@@ -251,7 +251,7 @@ class RatingViewPutTestCase(TestCase):
 
     def test_api_cannot_update_rating_with_bad_data(self):
         response = self.client.put(
-            reverse('rating-detail', kwargs={'pk':
+            reverse('api-rating-detail', kwargs={'pk':
                                              self.new_rating["id"]}),
             {"rating": 11}, format='json'
         )
@@ -292,12 +292,12 @@ class RatingViewDeleteTestCase(TestCase):
 
     def test_api_can_delete_rating(self):
         response = self.client.delete(
-            reverse('rating-detail', kwargs={'pk': self.new_rating["id"]}),
+            reverse('api-rating-detail', kwargs={'pk': self.new_rating["id"]}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_api_cannot_delete_fake_rating(self):
         response = self.client.delete(
-            reverse('rating-detail', kwargs={'pk': self.new_rating["id"]*50}),
+            reverse('api-rating-detail', kwargs={'pk': self.new_rating["id"]*50}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)

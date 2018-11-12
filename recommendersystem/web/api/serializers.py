@@ -58,9 +58,9 @@ class RatingSerializer(serializers.ModelSerializer):
     isbn = ISBNSlugRelatedField(slug_field='isbn',
                                 queryset=Book.objects.all())
 
-    isbn_url = HyperlinkedISBNIdentityField(view_name='book-detail',
+    isbn_url = HyperlinkedISBNIdentityField(view_name='api-book-detail',
                                             lookup_field="pk")
-    user_id_url = HyperlinkedUserIDIdentityField(view_name='user-detail',
+    user_id_url = HyperlinkedUserIDIdentityField(view_name='api-user-detail',
                                                  lookup_field="pk")
     id = serializers.IntegerField(source="pk", read_only=True)
 

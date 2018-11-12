@@ -35,19 +35,19 @@ class UserViewPostTestCase(TestCase):
 
     def test_api_can_create_user(self):
         self.response = self.client.post(
-            reverse('user-create'), self.new_user, format="json")
+            reverse('api-user-create'), self.new_user, format="json")
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
 
     def test_api_cannot_create_duplicate_user(self):
-        self.client.post(reverse('user-create'), self.new_user, format="json")
-        self.response = self.client.post(reverse('user-create'),
+        self.client.post(reverse('api-user-create'), self.new_user, format="json")
+        self.response = self.client.post(reverse('api-user-create'),
                                          self.new_user, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_user_with_invalid_field_len(self):
         self.new_user["user_id"] = "0" * 21
-        self.response = self.client.post(reverse('user-create'),
+        self.response = self.client.post(reverse('api-user-create'),
                                          self.new_user, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
@@ -68,14 +68,14 @@ class UserViewGetTestCase(TestCase):
     def test_api_can_get_user(self):
         user = User.objects.get()
         response = self.client.get(
-            reverse('user-detail',
+            reverse('api-user-detail',
                     kwargs={'pk': user.pk}), format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json.loads(response.content), self.new_user)
 
     def test_api_cannot_get_fake_user(self):
         response = self.client.get(
-            reverse('user-detail',
+            reverse('api-user-detail',
                     kwargs={'pk': -1}), format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -94,7 +94,7 @@ class UserViewPutTestCase(TestCase):
     def test_api_can_update_user(self):
         self.new_user["location"] = "blah"
         response = self.client.put(
-            reverse('user-detail', kwargs={'pk':
+            reverse('api-user-detail', kwargs={'pk':
                                            self.new_user["id"]}),
             self.new_user, format='json'
         )
@@ -103,7 +103,7 @@ class UserViewPutTestCase(TestCase):
     def test_api_cannot_update_fake_user(self):
         self.new_user["age"] = 0
         response = self.client.put(
-            reverse('user-detail', kwargs={'pk':
+            reverse('api-user-detail', kwargs={'pk':
                                            self.new_user["id"] * 50}),
             self.new_user, format='json'
         )
@@ -112,7 +112,7 @@ class UserViewPutTestCase(TestCase):
     def test_api_cannot_update_user_with_bad_data(self):
         self.new_user["age"] = 1000
         response = self.client.put(
-            reverse('user-detail', kwargs={'pk':
+            reverse('api-user-detail', kwargs={'pk':
                                            self.new_user["id"]}),
             self.new_user, format='json'
         )
@@ -132,14 +132,14 @@ class UserViewDeleteTestCase(TestCase):
 
     def test_api_can_delete_user(self):
         response = self.client.delete(
-            reverse("user-detail", kwargs={'pk':
+            reverse("api-user-detail", kwargs={'pk':
                                            self.new_user["id"]}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_api_cannot_delete_fake_user(self):
         response = self.client.delete(
-            reverse('user-detail', kwargs={'pk':
+            reverse('api-user-detail', kwargs={'pk':
                                            self.new_user["id"] * 50}),
             format='json', follow=True)
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)

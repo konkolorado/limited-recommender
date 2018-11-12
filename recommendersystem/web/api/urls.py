@@ -8,13 +8,13 @@ from django.conf.urls import include
 
 v1_urls = [
     path('', ApiV1RootView.as_view(), name="api_v1_root_view",),
-    path('books/', CreateBookView.as_view(), name="book-create"),
-    path('books/<pk>/', DetailBookView.as_view(), name="book-detail"),
-    path('users/', CreateUserView.as_view(), name="user-create"),
-    path('users/<pk>', DetailUserView.as_view(), name="user-detail"),
-    path('ratings/', CreateRatingView.as_view(), name="rating-create"),
+    path('books/', CreateBookView.as_view(), name="api-book-create"),
+    path('books/<pk>/', DetailBookView.as_view(), name="api-book-detail"),
+    path('users/', CreateUserView.as_view(), name="api-user-create"),
+    path('users/<pk>', DetailUserView.as_view(), name="api-user-detail"),
+    path('ratings/', CreateRatingView.as_view(), name="api-rating-create"),
     path('ratings/<pk>', DetailRatingView.as_view(),
-         name="rating-detail"),
+         name="api-rating-detail"),
 ]
 
 urlpatterns = {

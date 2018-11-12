@@ -84,7 +84,7 @@ class ApiV1RootView(APIView):
     def get(self, request, format=None):
         ''' List top level resources '''
         data = OrderedDict()
-        data['books'] = _reverse('book-create', request=request)
-        data['users'] = _reverse('user-create', request=request)
-        data['ratings'] = _reverse('rating-create', request=request)
+        data['books'] = _reverse('api-book-create', request=request)
+        data['users'] = _reverse('api-user-create', request=request)
+        data['ratings'] = _reverse('api-rating-create', request=request)
         return Response(data)
