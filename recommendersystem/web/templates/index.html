@@ -2,7 +2,6 @@
 
 {% block content %}
 
-
 <div class=container>
     <ul class="nav nav-tabs" id="model-tabs">
         <li class="{% if book_active %}active{% endif %}">
@@ -17,110 +16,43 @@
     </ul>
 
     <div class="tab-content">
-      <div id="books"
-            class="tab-pane fade in {% if book_active %}in active{% endif %}">
-          <div class="list-group">
-              {% for book in books %}
-                  {% url 'book-detail' book.pk as book_detail_url %}
-                      <a href="{{ book_detail_url }}" class="list-group-item">
-                          <h5>{{ book.title }}</h5>
-                          <p>{{ book.author }}</p>
-                      </a>
-              {% endfor %}
-
-
-              <ul class="step-links pagination">
-                {% if books.has_previous %}
-                  <li>
-                      <a href="?book_page={{ books.previous_page_number }}">&laquo;</a>
-                  </li>
-                {% else %}
-                  <li class="disabled"><span>&laquo;</span></li>
-                {% endif %}
-                {% for i in books.paginator.page_range %}
-                  {% if books.number == i %}
-                    <li class="current">
-                        <span>{{ i }} <span class="sr-only">(current)</span></span>
-                    </li>
-                  {% else %}
-                    <li><a href="?book_page={{ i }}">{{ i }}</a></li>
-                  {% endif %}
+        <div id="books" class="tab-pane fade {% if book_active %}in active{% endif %}">
+            <div class="list-group">
+                {% for book in books %}
+                    {% url 'book-detail' book.pk as book_detail_url %}
+                        <a href="{{ book_detail_url }}" class="list-group-item">
+                            <h5>{{ book.title }}</h5>
+                            <p>{{ book.author }}</p>
+                        </a>
                 {% endfor %}
-                {% if books.has_next %}
-                  <li><a href="?book_page={{ books.next_page_number }}">&raquo;</a></li>
-                {% else %}
-                  <li class="disabled"><span>&raquo;</span></li>
-                {% endif %}
-              </ul>
-
-          </div>
-      </div>
-      <div id="users" class="tab-pane fade {% if user_active %}in active{% endif %}">
-          <div class="list-group">
-              {% for user in users %}
-                  {% url 'user-detail' user.pk as user_detail_url %}
-                  <a href="{{ user_detail_url }}" class="list-group-item">
-                    <h5>User {{ user.user_id }}</h5>
-                    <p> Age {{ user.age}} from {{ user.location }} </p>
-                  </a>
-              {% endfor %}
-          </div>
-
-          <ul class="step-links pagination">
-            {% if users.has_previous %}
-              <li><a href="?user_page={{ users.previous_page_number }}">&laquo;</a></li>
-            {% else %}
-              <li class="disabled"><span>&laquo;</span></li>
-            {% endif %}
-            {% for i in users.paginator.page_range %}
-              {% if users.number == i %}
-                <li class="current"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-              {% else %}
-                <li><a href="?user_page={{ i }}">{{ i }}</a></li>
-              {% endif %}
-            {% endfor %}
-            {% if users.has_next %}
-              <li><a href="?user_page={{ users.next_page_number }}">&raquo;</a></li>
-            {% else %}
-              <li class="disabled"><span>&raquo;</span></li>
-            {% endif %}
-          </ul>
-
-
-      </div>
-      <div id="ratings" class="tab-pane fade {% if rating_active %}in active{% endif %}">
-          <div class="list-group">
-              {% for rating in ratings %}
-                  {% url 'rating-detail' rating.pk as rating_detail_url %}
-                  <a href="{{ rating_detail_url }}" class="list-group-item">
-                    <h5>{{ rating.rating }}</h5>
-                    <p>User {{ rating.user_id.user_id }}</p>
-                    <p>{{ rating.isbn.title }}</p>
-                  </a>
-              {% endfor %}
-
-              <ul class="step-links pagination">
-                {% if ratings.has_previous %}
-                  <li><a href="?rating_page={{ rating.previous_page_number }}">&laquo;</a></li>
-                {% else %}
-                  <li class="disabled"><span>&laquo;</span></li>
-                {% endif %}
-                {% for i in ratings.paginator.page_range %}
-                  {% if ratings.number == i %}
-                    <li class="current"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-                  {% else %}
-                    <li><a href="?rating_page={{ i }}">{{ i }}</a></li>
-                  {% endif %}
+                {% include "step_links_pagination.html" with page_query="book_page" paged_object=books%}
+            </div>
+        </div>
+        <div id="users" class="tab-pane fade {% if user_active %}in active{% endif %}">
+            <div class="list-group">
+                {% for user in users %}
+                    {% url 'user-detail' user.pk as user_detail_url %}
+                        <a href="{{ user_detail_url }}" class="list-group-item">
+                            <h5>User {{ user.user_id }}</h5>
+                            <p> Age {{ user.age}} from {{ user.location }} </p>
+                        </a>
                 {% endfor %}
-                {% if ratings.has_next %}
-                  <li><a href="?rating_page={{ ratings.next_page_number }}">&raquo;</a></li>
-                {% else %}
-                  <li class="disabled"><span>&raquo;</span></li>
-                {% endif %}
-              </ul>
-
-          </div>
-      </div>
+                {% include "step_links_pagination.html" with page_query="user_page" paged_object=users%}
+            </div>
+        </div>
+        <div id="ratings" class="tab-pane fade {% if rating_active %}in active{% endif %}">
+            <div class="list-group">
+                {% for rating in ratings %}
+                    {% url 'rating-detail' rating.pk as rating_detail_url %}
+                    <a href="{{ rating_detail_url }}" class="list-group-item">
+                        <h5>{{ rating.rating }}</h5>
+                        <p>User {{ rating.user_id.user_id }}</p>
+                        <p>{{ rating.isbn.title }}</p>
+                    </a>
+                {% endfor %}
+                {% include "step_links_pagination.html" with page_query="rating_page" paged_object=ratings%}
+            </div>
+        </div>
     </div>
 </div>
 
