@@ -1,1 +1,17 @@
 // Put styles here
+
+a:link {
+  color: black;
+}
+
+#main_content h5 {
+  color: black;
+}
+
+#main_content p {
+  color: black;
+}
+
+.nav {
+  padding-top: 25px;
+}

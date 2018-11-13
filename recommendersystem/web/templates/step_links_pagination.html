@@ -1,23 +1,26 @@
-<ul class="step-links pagination">
+<ul class="pagination justify-content-center">
   {% if paged_object.has_previous %}
-    <li>
-        <a href="?{{ page_query }}={{ paged_object.previous_page_number }}">&laquo;</a>
+    <li class="page-item">
+        <a class="page-link" href="?{{ page_query }}={{ paged_object.previous_page_number }}">&laquo;</a>
     </li>
   {% else %}
-    <li class="disabled"><span>&laquo;</span></li>
+    <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1">&laquo;</a></li>
   {% endif %}
+
   {% for i in paged_object.paginator.page_range %}
     {% if paged_object.number == i %}
-      <li class="current">
-          <span>{{ i }} <span class="sr-only">(current)</span></span>
+      <li class="page-item active">
+          <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
       </li>
     {% else %}
-      <li><a href="?{{ page_query }}={{ i }}">{{ i }}</a></li>
+      <li class="page-item"><a class="page-link" href="?{{ page_query }}={{ i }}">{{ i }}</a></li>
     {% endif %}
   {% endfor %}
+
   {% if paged_object.has_next %}
-    <li><a href="?{{ page_query }}={{ paged_object.next_page_number }}">&raquo;</a></li>
+    <li class="page-item"><a class="page-link" href="?{{ page_query }}={{ paged_object.next_page_number }}">&raquo;</a></li>
   {% else %}
-    <li class="disabled"><span>&raquo;</span></li>
+    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">&raquo;</a></li>
   {% endif %}
 </ul>
