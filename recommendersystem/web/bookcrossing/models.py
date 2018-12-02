@@ -15,6 +15,18 @@ class Book(models.Model):
     def __str__(self):
         return f'"{self.title}" by {self.author}'
 
+    def get_fields_for_display(self):
+        display = {
+            "ISBN": self.isbn,
+            "Title": self.title,
+            "Author": self.author,
+            "Publication Year": self.publication_yr
+        }
+        return display
+
+    def get_image_for_display(self):
+        return self.image_url_l
+
     class Meta:
         ordering = ["pk"]
 
@@ -31,6 +43,14 @@ class User(models.Model):
     def __repr__(self):
         return self.user_id
 
+    def get_fields_for_display(self):
+        display = {
+            "User ID": self.user_id,
+            "Location": self.location.split(',')[-1],
+            "Age": self.age,
+        }
+        return display
+
     class Meta:
         ordering = ["pk"]
 
@@ -46,6 +66,14 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"Book {self.isbn} User {self.user_id}: {self.rating}"
+
+    def get_fields_for_display(self):
+        display = {
+            "User ID": self.user_id.id,
+            "ISBN": self.isbn.isbn,
+            "Rating": self.rating,
+        }
+        return display
 
     class Meta:
         ordering = ["pk"]

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card mx-auto">
+    <ul class="card-text" style="">
+        {% for name, value in object.get_fields_for_display.items %}
+            <li><strong>{{ name }}</strong>: {{ value }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if object.get_image_for_display %}
+        <img class="card-image" src="{{ object.get_image_for_display }}" alt="Book image">
+    {% endif %}
+</div>
+
+{% endblock content %}

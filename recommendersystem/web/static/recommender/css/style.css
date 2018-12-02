@@ -15,3 +15,26 @@ a:link {
 .nav {
   padding-top: 25px;
 }
+
+.card {
+  margin: 10px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  padding: 10px;
+  transition: 0.3s;
+  width: 350px;
+  height: auto;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.card-text {
+  list-style-type: none;
+}
+
+.card-image {
+  height: 350px;
+  background-size: contain;
+}
