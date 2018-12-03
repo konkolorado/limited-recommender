@@ -1,5 +1,8 @@
 from django.db import models
+from django.urls import reverse
 from django.core.validators import MaxValueValidator, MinValueValidator
+import requests
+from django.conf import settings
 
 
 class Book(models.Model):
@@ -51,6 +54,16 @@ class User(models.Model):
         }
         return display
 
+    def get_ratings_for_display(self):
+        response = requests.get(
+            settings.DEFAULT_ORIGIN + reverse("api-rating-create"),
+            params={"user_id": self.user_id})
+        json_response = response.json()
+        ratings = []
+        for result in json_response["results"]:
+            ratings.append((result["rating"], result["isbn_url"]))
+        return ratings
+
     class Meta:
         ordering = ["pk"]
 
@@ -72,8 +85,12 @@ class Rating(models.Model):
             "User ID": self.user_id.id,
             "ISBN": self.isbn.isbn,
             "Rating": self.rating,
+
         }
         return display
+
+    def get_image_for_display(self):
+        return self.isbn.image_url_l
 
     class Meta:
         ordering = ["pk"]

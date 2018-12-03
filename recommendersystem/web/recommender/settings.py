@@ -26,6 +26,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+DEFAULT_SCHEMA = "http://"
+DEFAULT_HOST = "localhost"
+DEAFAULT_PORT = "80"
+DEFAULT_ORIGIN = DEFAULT_SCHEMA + DEFAULT_HOST + ":" + DEAFAULT_PORT
 
 # Application definition
 

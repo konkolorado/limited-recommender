@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="card mx-auto">
-    <ul class="card-text" style="">
+    <ul class="card-text">
         {% for name, value in object.get_fields_for_display.items %}
             <li><strong>{{ name }}</strong>: {{ value }}</li>
         {% endfor %}
@@ -12,6 +12,14 @@
     {% if object.get_image_for_display %}
         <img class="card-image" src="{{ object.get_image_for_display }}" alt="Book image">
     {% endif %}
+
+
+    <ul class="card-text">
+    {% for rating, isbn_url in object.get_ratings_for_display %}
+        <li><strong>Rating</strong> for {{ isbn_url }}: {{ rating }}</li>
+    {% endfor %}
+    </ul>
+
 </div>
 
 {% endblock content %}
