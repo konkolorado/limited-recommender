@@ -18,7 +18,7 @@
 
 - name: Wait for postgres to become ready
   pause:
-    seconds: 15
+    seconds: 10
   when: pg_deploy.changed
 
 - name: Deploy the limited recommender system web container
@@ -36,7 +36,8 @@
     command:
       - ash
       - -c
-      - "cd /usr/src/app/web/; /build/files/start.sh"
+      - |
+        "cd /usr/src/app/web/; /build/files/start.sh"
     env:
       DATABASE: "bookcrossing"
       DATABASE_USER: "bookcrossing"
