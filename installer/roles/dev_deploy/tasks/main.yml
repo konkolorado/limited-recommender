@@ -30,7 +30,7 @@
     volumes:
       - ../data/:/data:ro
       - ../recommendersystem/web/:/usr/src/app/web:rw
-      - ./roles/image_build/files/:/build/files
+      - ./roles/image_build/files/start.sh:/build/files/start.sh
     links:
      - "postgres:postgres"
     command:
