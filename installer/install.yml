@@ -3,6 +3,13 @@
   hosts: localhost
   gather_facts: false
   force_handlers: true
+  tasks:
+    - include_role:
+        name: dev_deploy
+      when: mode == "DEVELOPMENT"
+    - include_role:
+        name: docker_deploy
+      when: mode == "PRODUCTION"
+
   roles:
     - { role: image_build }
-    - { role: docker_deploy }

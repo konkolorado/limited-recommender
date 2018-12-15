@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 data/
+
+recommendersystem/web/static/admin
+recommendersystem/web/static/rest_framework
+recommendersystem/web/bookcrossing/migrations/*initial.py

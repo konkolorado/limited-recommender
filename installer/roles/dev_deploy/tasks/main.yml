@@ -1,0 +1,49 @@
+---
+- name: Deploy the postgresql container
+  docker_container:
+    name: postgres
+    image: postgres:9.6-alpine
+    volumes:
+      - ../data/:/data:ro
+      - /tmp/docker/pgdata:/var/lib/postgresql/data
+    env:
+      POSTGRES_USER: "bookcrossing"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "bookcrossing"
+      PG_DATA: "/var/lib/postgresql/data"
+      PGBOOKS: "/data/BX-Books-Cleansed-Tini.csv"
+      PGUSERS: "/data/BX-Users-Cleansed-Tini.csv"
+      PGRATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
+  register: pg_deploy
+
+- name: Wait for postgres to become ready
+  pause:
+    seconds: 15
+  when: pg_deploy.changed
+
+- name: Deploy the limited recommender system web container
+  docker_container:
+    name: limited_recommender
+    image: limited_recommender
+    ports:
+      - "80:80"
+    volumes:
+      - ../data/:/data:ro
+      - ../recommendersystem/web/:/usr/src/app/web:rw
+      - ./roles/image_build/files/:/build/files
+    links:
+     - "postgres:postgres"
+    command:
+      - ash
+      - -c
+      - "cd /usr/src/app/web/; /build/files/start.sh"
+    env:
+      DATABASE: "bookcrossing"
+      DATABASE_USER: "bookcrossing"
+      DATABASE_PASSWORD: "password"
+      DATABASE_HOST: "postgres"
+      DATABASE_PORT: "5432"
+      BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
+      USERS: "/data/BX-Users-Cleansed-Tini.csv"
+      RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
+      SECRET_KEY: "{{ secret_key }}"
