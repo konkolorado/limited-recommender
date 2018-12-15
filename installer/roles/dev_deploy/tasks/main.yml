@@ -1,4 +1,8 @@
 ---
+- name: Create a network
+  docker_network:
+    name: RecommenderNetwork
+
 - name: Deploy the postgresql container
   docker_container:
     name: postgres
@@ -6,6 +10,10 @@
     volumes:
       - ../data/:/data:ro
       - /tmp/docker/pgdata:/var/lib/postgresql/data
+    networks:
+      - name: RecommenderNetwork
+        aliases:
+          - postgresql
     env:
       POSTGRES_USER: "bookcrossing"
       POSTGRES_PASSWORD: "password"
@@ -31,8 +39,8 @@
       - ../data/:/data:ro
       - ../recommendersystem/web/:/usr/src/app/web:rw
       - ./roles/image_build/files/start.sh:/build/files/start.sh
-    links:
-     - "postgres:postgres"
+    networks:
+      - name: RecommenderNetwork
     command:
       - ash
       - -c
