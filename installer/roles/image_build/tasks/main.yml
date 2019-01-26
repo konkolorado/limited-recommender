@@ -24,3 +24,12 @@
     dockerfile: Dockerfile
     force: yes
   notify: clean images
+
+- name: Build the limited recommender system task image
+  docker_image:
+    name: limited_recommender_task
+    path: "{{ role_path }}/files"
+    dockerfile: Dockerfile.task
+    force: yes
+    pull: no
+  notify: clean images

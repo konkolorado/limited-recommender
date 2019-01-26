@@ -1,0 +1,13 @@
+FROM limited_recommender
+
+USER 0
+
+RUN apk del nginx
+
+USER 1000
+
+COPY start_task.sh .
+COPY supervisor_task.conf /
+
+EXPOSE 8052
+CMD ./start_task.sh
