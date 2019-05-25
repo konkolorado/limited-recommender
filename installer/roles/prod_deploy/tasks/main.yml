@@ -2,10 +2,10 @@
 - name: Create a network
   docker_network:
     name: RecommenderNetwork
-    
+
 - name: Deploy the postgresql container
   docker_container:
-    name: postgres
+    name: recommender_postgres
     image: postgres:9.6-alpine
     volumes:
       - ../data/:/data:ro
@@ -31,8 +31,8 @@
 
 - name: Deploy the limited recommender system web container
   docker_container:
-    name: limited_recommender
-    image: limited_recommender
+    name: recommender_web
+    image: recommender_web
     ports:
       - "80:80"
     volumes:

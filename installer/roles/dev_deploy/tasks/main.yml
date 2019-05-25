@@ -5,12 +5,12 @@
 
 - name: Deploy the postgresql container
   docker_container:
-    name: postgres
+    name: recommender_postgres
     image: postgres:9.6-alpine
     volumes:
       - ../data/:/data:ro
       - /tmp/docker/pgdata:/var/lib/postgresql/data
-    networks_cli_compatible: yes
+    #networks_cli_compatible: "yes"
     networks:
       - name: RecommenderNetwork
         aliases:
@@ -32,14 +32,14 @@
 
 - name: Deploy the limited recommender system web container
   docker_container:
-    name: limited_recommender
-    image: limited_recommender
+    name: recommender_web
+    image: recommender_web
     ports:
       - "80:80"
     volumes:
       - ../data/:/data:ro
       - ../recommendersystem/web/:/usr/src/app/web:rw
-      - ./roles/image_build/files/start.sh:/build/files/start.sh
+      - ./roles/image_build/files/start_web.sh:/build/files/start_web.sh
     networks_cli_compatible: yes
     networks:
       - name: RecommenderNetwork
@@ -47,7 +47,7 @@
       - ash
       - -c
       - |
-        "cd /usr/src/app/web/; /build/files/start.sh"
+        "cd /usr/src/app/web/; /build/files/start_web.sh"
     env:
       DATABASE: "bookcrossing"
       DATABASE_USER: "bookcrossing"
@@ -61,8 +61,8 @@
 
 - name: Deploy the limited recommender system task container
   docker_container:
-    name: limited_recommender_task
-    image: limited_recommender_task:latest
+    name: recommender_task
+    image: recommender_task
     volumes:
       - ../recommendersystem/web/:/usr/src/app/web:rw
       - ./roles/image_build/files/start_task.sh:/build/files/start_task.sh

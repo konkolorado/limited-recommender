@@ -6,9 +6,9 @@ RUN apk update && apk add postgresql-dev gcc musl-dev nginx supervisor
 ADD requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY start.sh .
+COPY start_web.sh .
 COPY nginx.conf /etc/nginx/
-COPY supervisor.conf /
+COPY supervisor_web.conf /
 
 COPY web .
-CMD ./start.sh
+CMD ./start_web.sh

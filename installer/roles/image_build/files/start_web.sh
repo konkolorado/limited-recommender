@@ -20,4 +20,4 @@ python manage.py test --noinput
 # Collect static files
 python manage.py collectstatic --no-input --link
 
-supervisord -c /supervisor.conf
+supervisord -c /supervisor_web.conf

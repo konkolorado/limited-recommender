@@ -18,19 +18,20 @@
     dest: "{{ role_path }}/files"
   notify: unstage
 
-- name: Build the limited recommender system image
+- name: Build the limited recommender system web image
   docker_image:
-    name: limited_recommender
+    name: recommender_web
     source: build
     build:
       path: "{{ role_path }}/files"
       pull: yes
+      dockerfile: Dockerfile.web
     force_source: yes
   notify: clean images
 
 - name: Build the limited recommender system task image
   docker_image:
-    name: limited_recommender_task
+    name: recommender_task
     source: build
     build:
       path: "{{ role_path }}/files"

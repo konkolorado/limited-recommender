@@ -1,4 +1,4 @@
-FROM limited_recommender
+FROM recommender_web
 
 USER 0
 
