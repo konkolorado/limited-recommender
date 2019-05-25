@@ -1,8 +1,9 @@
 ---
 # tasks file for image_build
-- name: Build the postgresql image
+- name: Pull the postgresql image
   docker_image:
     name: postgres:9.6-alpine
+    source: pull
   notify: clean images
 
 - name: Stage the requirements file for the limited recommender image
@@ -20,16 +21,20 @@
 - name: Build the limited recommender system image
   docker_image:
     name: limited_recommender
-    path: "{{ role_path }}/files"
-    dockerfile: Dockerfile
-    force: yes
+    source: build
+    build:
+      path: "{{ role_path }}/files"
+      pull: yes
+    force_source: yes
   notify: clean images
 
 - name: Build the limited recommender system task image
   docker_image:
     name: limited_recommender_task
-    path: "{{ role_path }}/files"
-    dockerfile: Dockerfile.task
-    force: yes
-    pull: no
+    source: build
+    build:
+      path: "{{ role_path }}/files"
+      pull: no
+      dockerfile: Dockerfile.task
+    force_source: yes
   notify: clean images
