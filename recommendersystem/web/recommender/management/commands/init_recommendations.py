@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from bookcrossing.models import User, Book, Rating
+from recommender.models import Recommendation
 import numpy
 
 
@@ -23,7 +24,7 @@ class Command(BaseCommand):
 
         for book in books:
             similar_books_collection = dict()
-            similar_books_collection[book.title] = [0] * n_users
+            similar_books_collection[book] = [0] * n_users
 
             # get ratings for book b, store in set A
             ratings_on_book = Rating.objects.filter(isbn__id=book.id)
@@ -37,16 +38,26 @@ class Command(BaseCommand):
 
                 # Record somewhere that user bought both items
                 for other_rating in users_other_ratings:
-                    other_title = other_rating.isbn.title
+                    other_book = other_rating.isbn
+                    other_title = other_book.title
 
                     if other_title not in similar_books_collection:
-                        similar_books_collection[other_title] = [0] * n_users
-                    similar_books_collection[other_title][rater_id-1] = 1
-                    similar_books_collection[book.title][rater_id-1] = 1
+                        similar_books_collection[other_book] = [0] * n_users
+                    similar_books_collection[other_book][rater_id-1] = 1
+                    similar_books_collection[book][rater_id-1] = 1
 
-            for book_title in similar_books_collection:
-                if book_title == book.title:
+            # Compute and store similarity score between the items bought
+            # together
+            for target_book in similar_books_collection:
+                if target_book.title == book.title:
                     continue
-                print(self.calc_cosine_similarity(
-                    similar_books_collection[book.title],
-                    similar_books_collection[book_title]))
+
+                similarity_score_local = self.calc_cosine_similarity(
+                    similar_books_collection[book],
+                    similar_books_collection[target_book])
+                returned, new = Recommendation.objects.get_or_create(
+                    purchased=Book.objects.get(isbn=book.isbn),
+                    recommended=Book.objects.get(isbn=target_book.isbn),
+                    similarity_score=round(similarity_score_local, 14))
+                print(similar_books_collection[book], similar_books_collection[target_book])
+                print(returned.purchased, returned.recommended, returned.similarity_score, new)
