@@ -48,6 +48,7 @@ class Command(BaseCommand):
 
             # Compute and store similarity score between the items bought
             # together
+            counter = 0
             for target_book in similar_books_collection:
                 if target_book.title == book.title:
                     continue
@@ -55,9 +56,10 @@ class Command(BaseCommand):
                 similarity_score_local = self.calc_cosine_similarity(
                     similar_books_collection[book],
                     similar_books_collection[target_book])
-                returned, new = Recommendation.objects.get_or_create(
+                _, new = Recommendation.objects.get_or_create(
                     purchased=Book.objects.get(isbn=book.isbn),
                     recommended=Book.objects.get(isbn=target_book.isbn),
                     similarity_score=round(similarity_score_local, 14))
-                print(similar_books_collection[book], similar_books_collection[target_book])
-                print(returned.purchased, returned.recommended, returned.similarity_score, new)
+                if new:
+                    counter += 1
+            print(f"Successfully loaded similarity scores for {counter} items")
