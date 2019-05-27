@@ -7,6 +7,8 @@
   docker_container:
     name: recommender_postgres
     image: postgres:9.6-alpine
+    volumes:
+      - /tmp/docker/pgdata:/var/lib/postgresql/data
     #networks_cli_compatible: "yes"
     networks:
       - name: RecommenderNetwork
