@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'bookcrossing',
     'rest_framework',
     'django_filters',
+    'recommender',
     'api',
 ]
 
