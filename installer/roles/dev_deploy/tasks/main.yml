@@ -7,9 +7,6 @@
   docker_container:
     name: recommender_postgres
     image: postgres:9.6-alpine
-    volumes:
-      - ../data/:/data:ro
-      - /tmp/docker/pgdata:/var/lib/postgresql/data
     #networks_cli_compatible: "yes"
     networks:
       - name: RecommenderNetwork
@@ -20,9 +17,6 @@
       POSTGRES_PASSWORD: "password"
       POSTGRES_DB: "bookcrossing"
       PG_DATA: "/var/lib/postgresql/data/db-files"
-      PGBOOKS: "/data/BX-Books-Cleansed-Tini.csv"
-      PGUSERS: "/data/BX-Users-Cleansed-Tini.csv"
-      PGRATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
   register: pg_deploy
 
 - name: Wait for postgres to become ready
@@ -37,7 +31,6 @@
     ports:
       - "80:80"
     volumes:
-      - ../data/:/data:ro
       - ../recommendersystem/web/:/usr/src/app/web:rw
       - ./roles/image_build/files/start_web.sh:/build/files/start_web.sh
     networks_cli_compatible: yes
@@ -54,9 +47,6 @@
       DATABASE_PASSWORD: "password"
       DATABASE_HOST: "postgresql"
       DATABASE_PORT: "5432"
-      BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
-      USERS: "/data/BX-Users-Cleansed-Tini.csv"
-      RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
       SECRET_KEY: "{{ secret_key }}"
 
 - name: Deploy the limited recommender system task container
@@ -64,13 +54,14 @@
     name: recommender_task
     image: recommender_task
     volumes:
+      - ../data/:/data:ro
       - ../recommendersystem/web/:/usr/src/app/web:rw
       - ./roles/image_build/files/start_task.sh:/build/files/start_task.sh
     command:
       - ash
       - -c
       - |
-        "cd /usr/src/app/web/; /build/files/start_task.sh; sleep 60"
+        "cd /usr/src/app/web/; /build/files/start_task.sh; sleep 600"
     networks_cli_compatible: yes
     networks:
       - name: RecommenderNetwork
@@ -81,3 +72,6 @@
       DATABASE_HOST: "postgresql"
       DATABASE_PORT: "5432"
       SECRET_KEY: "{{ secret_key }}"
+      BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
+      USERS: "/data/BX-Users-Cleansed-Tini.csv"
+      RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
