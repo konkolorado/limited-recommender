@@ -14,8 +14,8 @@
 
 - name: Stage the source code for the limited recommender image
   synchronize:
-    src: ../recommendersystem/web
-    dest: "{{ role_path }}/files"
+    src: ../recommendersystem/
+    dest: "{{ role_path }}/files/web"
   notify: unstage
 
 - name: Build the limited recommender system web image
