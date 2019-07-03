@@ -1,5 +1,5 @@
 FROM python:3.6-alpine
-WORKDIR /usr/src/app/web
+WORKDIR /usr/src/app/
 
 RUN apk update && apk add postgresql-dev gcc musl-dev nginx supervisor
 
