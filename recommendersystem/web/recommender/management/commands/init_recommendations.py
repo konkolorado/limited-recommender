@@ -19,6 +19,7 @@ class Command(BaseCommand):
         return numpy.dot(a, b)/(numpy.linalg.norm(a)*numpy.linalg.norm(b))
 
     def handle(self, *args, **options):
+        counter = 0
         books = Book.objects.all()
         n_users = User.objects.all().count()
 
@@ -48,7 +49,6 @@ class Command(BaseCommand):
 
             # Compute and store similarity score between the items bought
             # together
-            counter = 0
             for target_book in similar_books_collection:
                 if target_book.title == book.title:
                     continue
@@ -62,4 +62,5 @@ class Command(BaseCommand):
                     similarity_score=round(similarity_score_local, 14))
                 if new:
                     counter += 1
-            print(f"Successfully loaded similarity scores for {counter} items")
+
+        print(f"Successfully loaded similarity scores for {counter} items")
