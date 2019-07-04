@@ -18,7 +18,7 @@
       POSTGRES_USER: "bookcrossing"
       POSTGRES_PASSWORD: "password"
       POSTGRES_DB: "bookcrossing"
-      PG_DATA: "/var/lib/postgresql/data/db-files"
+      PG_DATA: "/var/lib/postgresql/data"
   register: pg_deploy
 
 - name: Wait for postgres to become ready
