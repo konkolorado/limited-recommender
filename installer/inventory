@@ -3,3 +3,4 @@ localhost ansible_connection=local ansible_python_interpreter="python"
 [all:vars]
 secret_key = "0#%t)jc$_@9^n$z!lxng%3g&ecahj1h8^$0p%qrh8_(j%tfua5"
 mode = "DEVELOPMENT"
+image_build = "False"
