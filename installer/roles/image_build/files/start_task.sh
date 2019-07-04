@@ -6,15 +6,15 @@ while ! nc -z $DATABASE_HOST $DATABASE_PORT; do
 done
 
 # Apply any pending migrations
-python manage.py makemigrations
-python manage.py migrate --no-input
+./manage.py makemigrations
+./manage.py migrate --no-input
 
 # Preload database
-python manage.py loadcsv -users_csv $USERS \
+./manage.py loadcsv -users_csv $USERS \
   -books_csv $BOOKS -ratings_csv $RATINGS
 
 # Run tests
 #TODO remove when finished
-python manage.py test --noinput
+./manage.py test --noinput
 
 ./manage.py init_recommendations
