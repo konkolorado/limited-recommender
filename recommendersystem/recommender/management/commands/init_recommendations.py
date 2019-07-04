@@ -63,4 +63,4 @@ class Command(BaseCommand):
                 if new:
                     counter += 1
 
-        print(f"Successfully loaded similarity scores for {counter} items")
+        print(f"Successfully loaded similarity scores for {counter} new items")
