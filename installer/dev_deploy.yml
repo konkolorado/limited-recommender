@@ -9,7 +9,7 @@
     image: postgres:9.6-alpine
     volumes:
       - /tmp/docker/pgdata:/var/lib/postgresql/data
-    #networks_cli_compatible: "yes"
+    networks_cli_compatible: "yes"
     networks:
       - name: RecommenderNetwork
         aliases:
@@ -33,16 +33,12 @@
     ports:
       - "80:80"
     volumes:
-      - ../recommendersystem/web/:/usr/src/app/web:rw
+      - ../recommendersystem/:/usr/src/app:rw
       - ./roles/image_build/files/start_web.sh:/build/files/start_web.sh
     networks_cli_compatible: yes
     networks:
       - name: RecommenderNetwork
-    command:
-      - ash
-      - -c
-      - |
-        "cd /usr/src/app/web/; /build/files/start_web.sh"
+    command: /build/files/start_web.sh
     env:
       DATABASE: "bookcrossing"
       DATABASE_USER: "bookcrossing"
@@ -57,13 +53,10 @@
     image: recommender_task
     volumes:
       - ../data/:/data:ro
-      - ../recommendersystem/web/:/usr/src/app/web:rw
+      - ../recommendersystem/:/usr/src/app:rw
       - ./roles/image_build/files/start_task.sh:/build/files/start_task.sh
     command:
-      - ash
-      - -c
-      - |
-        "cd /usr/src/app/web/; /build/files/start_task.sh; sleep 600"
+      - /build/files/start_task.sh
     networks_cli_compatible: yes
     networks:
       - name: RecommenderNetwork
