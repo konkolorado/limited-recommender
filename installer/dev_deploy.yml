@@ -1,0 +1,72 @@
+---
+- name: Create a network
+  docker_network:
+    name: RecommenderNetwork
+
+- name: Deploy the postgresql container
+  docker_container:
+    name: recommender_postgres
+    image: postgres:9.6-alpine
+    volumes:
+      - /tmp/docker/pgdata:/var/lib/postgresql/data
+    networks_cli_compatible: "yes"
+    networks:
+      - name: RecommenderNetwork
+        aliases:
+          - postgresql
+    env:
+      POSTGRES_USER: "bookcrossing"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "bookcrossing"
+      PG_DATA: "/var/lib/postgresql/data"
+  register: pg_deploy
+
+- name: Wait for postgres to become ready
+  pause:
+    seconds: 10
+  when: pg_deploy.changed
+
+- name: Deploy the limited recommender system web container
+  docker_container:
+    name: recommender_web
+    image: recommender_web
+    ports:
+      - "80:80"
+    volumes:
+      - ../recommendersystem/:/usr/src/app:rw
+      - ./roles/image_build/files/start_web.sh:/build/files/start_web.sh
+    networks_cli_compatible: yes
+    networks:
+      - name: RecommenderNetwork
+    command: /build/files/start_web.sh
+    env:
+      DATABASE: "bookcrossing"
+      DATABASE_USER: "bookcrossing"
+      DATABASE_PASSWORD: "password"
+      DATABASE_HOST: "postgresql"
+      DATABASE_PORT: "5432"
+      SECRET_KEY: "{{ secret_key }}"
+
+- name: Deploy the limited recommender system task container
+  docker_container:
+    name: recommender_task
+    image: recommender_task
+    volumes:
+      - ../data/:/data:ro
+      - ../recommendersystem/:/usr/src/app:rw
+      - ./roles/image_build/files/start_task.sh:/build/files/start_task.sh
+    command:
+      - /build/files/start_task.sh
+    networks_cli_compatible: yes
+    networks:
+      - name: RecommenderNetwork
+    env:
+      DATABASE: "bookcrossing"
+      DATABASE_USER: "bookcrossing"
+      DATABASE_PASSWORD: "password"
+      DATABASE_HOST: "postgresql"
+      DATABASE_PORT: "5432"
+      SECRET_KEY: "{{ secret_key }}"
+      BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
+      USERS: "/data/BX-Users-Cleansed-Tini.csv"
+      RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"

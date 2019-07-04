@@ -3,13 +3,14 @@
   hosts: all
   gather_facts: false
   force_handlers: true
+
   tasks:
     - include_role:
-        name: dev_deploy
-      when: mode == "DEVELOPMENT"
-    - include_role:
-        name: prod_deploy
-      when: mode == "PRODUCTION"
+        name: image_build
+      when: image_build == "True"
 
-  roles:
-    - { role: image_build }
+    - include_tasks: dev_deploy.yml
+      when: mode == "DEVELOPMENT"
+
+    - include_tasks: prod_deploy.yml
+      when: mode == "PRODUCTION"

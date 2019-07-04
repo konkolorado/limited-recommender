@@ -9,5 +9,4 @@ USER 1000
 COPY start_task.sh .
 COPY supervisor_task.conf /
 
-EXPOSE 8052
 CMD ./start_task.sh
