@@ -1,4 +1,0 @@
-- Docker compose file and location
-- Figure out other containers necessary
-- Work on web interface
-- Generalize models to be 1) users 2) items 3) ratings
