@@ -70,3 +70,18 @@
       BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
       USERS: "/data/BX-Users-Cleansed-Tini.csv"
       RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
+
+- name: Deploy the limited recommender system message broker
+  docker_container:
+    name: recommender_rabbit
+    image: rabbitmq:3-management-alpine
+    networks_cli_compatible: yes
+    networks:
+      - name: RecommenderNetwork
+    ports:
+      - "15672:15672"
+    env:
+      RABBITMQ_ERLANG_COOKIE: "recommendercookie"
+      RABBITMQ_DEFAULT_USER: "recommender"
+      RABBITMQ_DEFAULT_PASS: "password"
+      RABBITMQ_DEFAULT_VHOST: "recommender"
