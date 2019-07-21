@@ -46,6 +46,12 @@
       DATABASE_HOST: "postgresql"
       DATABASE_PORT: "5432"
       SECRET_KEY: "{{ secret_key }}"
+      RABBITMQ_USER: "recommender"
+      RABBITMQ_PASSWORD: "password"
+      RABBITMQ_HOST: "recommender_rabbit"
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_VHOST: "recommender"
+
 
 - name: Deploy the limited recommender system task container
   docker_container:
@@ -67,6 +73,11 @@
       DATABASE_HOST: "postgresql"
       DATABASE_PORT: "5432"
       SECRET_KEY: "{{ secret_key }}"
+      RABBITMQ_USER: "recommender"
+      RABBITMQ_PASSWORD: "password"
+      RABBITMQ_HOST: "recommender_rabbit"
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_VHOST: "recommender"
       BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
       USERS: "/data/BX-Users-Cleansed-Tini.csv"
       RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
