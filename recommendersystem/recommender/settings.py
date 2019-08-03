@@ -100,6 +100,12 @@ DATABASES = {
     }
 }
 
+BROKER_URL = 'amqp://{}:{}@{}:{}/{}'.format(
+    os.getenv("RABBITMQ_USER"),
+    os.getenv("RABBITMQ_PASSWORD"),
+    os.getenv("RABBITMQ_HOST"),
+    os.getenv("RABBITMQ_PORT"),
+    os.getenv("RABBITMQ_VHOST"))
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

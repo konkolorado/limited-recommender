@@ -18,3 +18,5 @@ done
 ./manage.py test --noinput
 
 ./manage.py init_recommendations
+
+./manage.py launch_dispatcher

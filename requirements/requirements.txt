@@ -3,6 +3,7 @@ django-filter==2.0.0
 djangorestframework==3.9.1
 docker==4.0.1
 gunicorn==19.7.1
+kombu==4.6.3   
 numpy==1.16.0
 psycopg2-binary==2.7.5
 pytz==2018.5

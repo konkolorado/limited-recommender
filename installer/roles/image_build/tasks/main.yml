@@ -1,11 +1,4 @@
 ---
-# tasks file for image_build
-- name: Pull the postgresql image
-  docker_image:
-    name: postgres:9.6-alpine
-    source: pull
-  notify: clean images
-
 - name: Stage the requirements file for the limited recommender image
   copy:
     src: ../requirements/requirements.txt
