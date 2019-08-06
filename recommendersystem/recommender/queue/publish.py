@@ -8,11 +8,10 @@ from django.conf import settings
 
 import sys
 
-# Function taken from AWX Project
-# https://github.com/ansible/awx/blob/devel/awx/main/dispatch/publish.py#L14
-
 
 def serialize_task(f):
+    # Function taken from AWX Project
+    # https://github.com/ansible/awx/blob/devel/awx/main/dispatch/publish.py#L14
     return '.'.join([f.__module__, f.__name__])
 
 
