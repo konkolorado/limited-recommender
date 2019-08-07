@@ -1,0 +1,15 @@
+---
+- name: Load the deployment variables into memory
+  include_vars:
+    file: "{{ deployment_env }}_config.yml"
+
+- name: Render the docker-compose.yml.j2 template
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ role_path }}/tasks/docker-compose.yml"
+
+- name: Deploy the application
+  docker_compose:
+    project_name: limited-recommender
+    project_src: "{{ role_path }}/tasks"
+    state: present

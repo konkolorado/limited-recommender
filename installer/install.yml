@@ -9,8 +9,12 @@
         name: image_build
       when: image_build == "True"
 
-    - include_tasks: dev_deploy.yml
-      when: mode == "DEVELOPMENT"
+    - include_role:
+        name: compose
+      vars:
+        deployment_env: "dev"
+    #- include_tasks: dev_deploy.yml
+    #  when: mode == "DEVELOPMENT"
 
-    - include_tasks: prod_deploy.yml
-      when: mode == "PRODUCTION"
+    #- include_tasks: prod_deploy.yml
+    #  when: mode == "PRODUCTION"
