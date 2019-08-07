@@ -8,4 +8,4 @@ class Command(BaseCommand):
         'publish messages to queues.'
 
     def handle(self, *args, **options):
-        empty_func(2, 10)
+        empty_func.publish(2, 10)
