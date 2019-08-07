@@ -32,4 +32,4 @@ class Worker(ConsumerMixin):
         module, task = body['function'].rsplit('.', 1)
         module = importlib.import_module(module)
         callable = getattr(module, task, None)
-        return callable._original
+        return callable.execute

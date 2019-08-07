@@ -6,8 +6,6 @@ from kombu import Connection, Exchange, Queue
 
 from django.conf import settings
 
-import sys
-
 
 def serialize_task(f):
     # Function taken from AWX Project
@@ -26,6 +24,11 @@ class task(object):
         self.routing_key = routing_key
 
     def __call__(self, function):
+        def execute(*args, **kwargs):
+            return function(*args, **kwargs)
+
+        def publish(*args, **kwargs):
+            return wrapper(*args, **kwargs)
 
         # The inner function is required to capture the arguments passed to
         # the decorated function
@@ -44,10 +47,7 @@ class task(object):
                                  routing_key='new_recommendation',
                                  declare=[queue],
                                  retry=True)
-            print("Published message")
-            sys.stdout.flush()
 
-        # Required to allow the task to be called without triggering
-        # another message to be published
-        wrapper._original = function
-        return wrapper
+        setattr(function, 'publish', publish)
+        setattr(function, 'execute', execute)
+        return function
