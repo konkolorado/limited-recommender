@@ -11,10 +11,8 @@
 
     - include_role:
         name: compose
-      vars:
-        deployment_env: "dev"
-    #- include_tasks: dev_deploy.yml
-    #  when: mode == "DEVELOPMENT"
+      when: deployment == "compose"
 
-    #- include_tasks: prod_deploy.yml
-    #  when: mode == "PRODUCTION"
+    - include_role:
+        name: kubernetes
+      when: deployment == "kubernetes"
