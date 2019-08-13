@@ -1,8 +1,4 @@
 ---
-- name: Load the deployment variables into memory
-  include_vars:
-    file: "dev_config.yml"
-
 - name: Create the target K8s namespace
   k8s:
     state: present

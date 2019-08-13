@@ -1,3 +1,12 @@
+# DEPLOYMENT VARIABLES
+image_build: "False"
+# Deployment method is either compose or kubernetes
+# compose is for local development, kubernetes is for deployment
+deployment: "kubernetes"
+
+# ------------------------- #
+
+# APPLICATION VARIABLES
 database_name: "bookcrossing"
 database_user: "bookcrossing"
 database_host: "postgresql"
@@ -12,3 +21,5 @@ rabbitmq_erlang_cookie: "cookiemonster"
 rabbitmq_password: "password"
 
 django_secret_key: "supersecretkey"
+
+recommender_namespace: "recommender"

@@ -1,9 +1,1 @@
 localhost ansible_connection=local ansible_python_interpreter="python"
-
-[all:vars]
-
-image_build = "False"
-
-# Deployment method is either compose or kubernetes
-# compose is for local development, kubernetes is for deployment
-deployment = "compose"

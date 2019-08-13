@@ -5,6 +5,9 @@
   force_handlers: true
 
   tasks:
+    - include_vars:
+        file: config.yml
+
     - include_role:
         name: image_build
       when: image_build == "True"
