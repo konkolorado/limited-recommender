@@ -61,10 +61,7 @@ spec:
                 name: recommender-secrets
                 key: rabbitmq_password
           - name: RABBITMQ_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: recommender-config
-                key: rabbitmq_host
+            value: localhost
           - name: RABBITMQ_PORT
             valueFrom:
               configMapKeyRef:
@@ -119,10 +116,7 @@ spec:
                 name: recommender-secrets
                 key: rabbitmq_password
           - name: RABBITMQ_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: recommender-config
-                key: rabbitmq_host
+            value: localhost
           - name: RABBITMQ_PORT
             valueFrom:
               configMapKeyRef:
