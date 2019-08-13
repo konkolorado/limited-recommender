@@ -1,4 +1,4 @@
-# DEPLOYMENT VARIABLES
+# BUILD AND DEPLOYMENT VARIABLES
 image_build: "False"
 # Deployment method is either compose or kubernetes
 # compose is for local development, kubernetes is for deployment
