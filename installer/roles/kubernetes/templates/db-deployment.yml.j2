@@ -19,7 +19,7 @@ spec:
         image: postgres:9.6-alpine
         imagePullPolicy: IfNotPresent
         ports:
-          - containerPort: 5432
+          - containerPort: {{ database_port }}
             protocol: TCP
         env:
           - name: POSTGRES_USER
@@ -27,15 +27,20 @@ spec:
               configMapKeyRef:
                 name: recommender-config
                 key: database_user
-          - name: POSTGRES_DB
-            valueFrom:
-              configMapKeyRef:
-                name: recommender-config
-                key: database_name
-          - name: PG_DATA
-            value: "/var/lib/postgresql/data"
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: recommender-secrets
                 key: database_password
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: recommender-config
+                key: database_name
+          - name: PGPORT
+            valueFrom:
+              configMapKeyRef:
+                name: recommender-config
+                key: database_port
+          - name: PG_DATA
+            value: "/var/lib/postgresql/data"

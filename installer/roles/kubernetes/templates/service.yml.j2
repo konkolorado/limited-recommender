@@ -20,7 +20,7 @@ metadata:
   name: recommender-rmq-mgmt
   namespace: {{ recommender_namespace }}
 spec:
-  type: NodePort
+  type: NodePort # Exposes interface on http://localhost:port
   ports:
     - name: rmqmgmt
       port: 15672
