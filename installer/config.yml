@@ -2,7 +2,7 @@
 image_build: "False"
 # Deployment method is either compose or kubernetes
 # compose is for local development, kubernetes is for deployment
-deployment: "kubernetes"
+deployment: "compose"
 
 # ------------------------- #
 

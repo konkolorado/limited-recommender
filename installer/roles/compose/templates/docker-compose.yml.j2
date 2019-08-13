@@ -26,8 +26,8 @@ services:
   recommender_task:
     image: recommender_task:latest
     container_name: recommender_task
-    #volumes:
-      #- ../data/:/data:ro
+    volumes:
+      - ../../../../data/:/data/:ro
     links:
       - "recommender_postgresql:postgresql"
       - "recommender_rabbitmq:rabbitmq"
