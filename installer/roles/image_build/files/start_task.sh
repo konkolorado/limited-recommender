@@ -5,6 +5,11 @@ while ! nc -z $DATABASE_HOST $DATABASE_PORT; do
   sleep 1
 done
 
+# Wait for message broker to start acception connections
+while ! nc -z $RABBITMQ_HOST $RABBITMQ_PORT; do
+  sleep 1
+done
+
 # Apply any pending migrations
 ./manage.py makemigrations
 ./manage.py migrate --no-input
