@@ -1,0 +1,39 @@
+---
+- name: Load the deployment variables into memory
+  include_vars:
+    file: "{{ deployment_env }}_config.yml"
+
+- name: Create the target K8s namespace
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'namespace.yml.j2') }}"
+
+- name: Create the K8s secret
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'secret.yml.j2') }}"
+
+- name: Create the K8s configmap
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'configmap.yml.j2') }}"
+
+- name: Create the K8s application services
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'service.yml.j2') }}"
+
+- name: Create the K8s ingress
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'ingress.yml.j2') }}"
+
+- name: Create the PostgreSQL database
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'pg-deployment.yml.j2') }}"
+
+- name: Create the K8s deployment
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'deployment.yml.j2') }}"

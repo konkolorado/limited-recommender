@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recommender-config
+  namespace: {{ recommender_namespace }}
+data:
+  database_name: "{{ database_name }}"
+  database_user: "{{ database_user }}"
+  database_host: "{{ database_host }}"
+  database_port: "{{ database_port }}"
+  rabbitmq_user: "{{ rabbitmq_user }}"
+  rabbitmq_host: "{{ rabbitmq_host }}"
+  rabbitmq_port: "{{ rabbitmq_port }}"
+  rabbitmq_vhost: "{{ rabbitmq_vhost }}"

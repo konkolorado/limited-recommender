@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommender-database
+  namespace: {{ recommender_namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommender-database
+  template:
+    metadata:
+      labels:
+        app: recommender-database
+    spec:
+      containers:
+      - name: recommender-postgresql
+        image: postgres:9.6-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 5432
+            protocol: TCP
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              configMapKeyRef:
+                name: recommender-config
+                key: database_user
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: recommender-config
+                key: database_name
+          - name: PG_DATA
+            value: "/var/lib/postgresql/data"
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: recommender-secrets
+                key: database_password
