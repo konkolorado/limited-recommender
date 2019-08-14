@@ -7,6 +7,8 @@ services:
     ports:
       - target: "8050"
         published: "8050"
+    volumes:
+      - ../../../../recommendersystem/:/usr/src/app:rw
     links:
       - "recommender_postgresql:postgresql"
       - "recommender_rabbitmq:rabbitmq"
@@ -28,6 +30,7 @@ services:
     container_name: recommender_task
     volumes:
       - ../../../../data/:/data/:ro
+      - ../../../../recommendersystem/:/usr/src/app:rw
     links:
       - "recommender_postgresql:postgresql"
       - "recommender_rabbitmq:rabbitmq"
