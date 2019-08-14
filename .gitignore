@@ -2,6 +2,8 @@
 __pycache__/
 *.pyc
 data/
+ansible.cfg
+docker-compose.yml
 
 recommendersystem/web/static/admin
 recommendersystem/web/static/rest_framework

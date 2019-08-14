@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommender-web-svc
+  namespace: {{ recommender_namespace }}
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8050
+      targetPort: 8050
+  selector:
+    app: recommender
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommender-rmq-mgmt
+  namespace: {{ recommender_namespace }}
+spec:
+  type: NodePort # Exposes interface on http://localhost:port
+  ports:
+    - name: rmqmgmt
+      port: 15672
+      targetPort: 15672
+  selector:
+    app: recommender
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommender-postgresql
+  namespace: {{ recommender_namespace }}
+spec:
+  ports:
+    - port: {{ database_port }}
+  selector:
+    app: recommender-database
+  clusterIP: None

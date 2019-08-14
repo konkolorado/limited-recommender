@@ -1,0 +1,16 @@
+---
+- name: Render the docker-compose.yml.j2 template
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ role_path }}/templates/docker-compose.yml"
+
+- name: Deploy the application
+  docker_compose:
+    project_name: limited-recommender
+    project_src: "{{ role_path }}/templates/"
+    state: present
+
+- name: Remove the templated docker-compose.yml file
+  file:
+    path: "{{ role_path }}/templates/docker-compose.yml"
+    state: absent

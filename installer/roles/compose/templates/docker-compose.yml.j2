@@ -1,0 +1,75 @@
+version: '3.2'
+
+services:
+  recommender_web:
+    image: recommender_web:latest
+    container_name: recommender_web
+    ports:
+      - target: "80"
+        published: "8000"
+    volumes:
+      - ../../../../recommendersystem/:/usr/src/app:rw
+    links:
+      - "recommender_postgresql:postgresql"
+      - "recommender_rabbitmq:rabbitmq"
+    environment:
+      DATABASE: "{{ database_name }}"
+      DATABASE_USER: "{{ database_user }}"
+      DATABASE_PASSWORD: "{{ database_password }}"
+      DATABASE_HOST: "{{ database_host }}"
+      DATABASE_PORT: "{{ database_port }}"
+      SECRET_KEY: "{{ django_secret_key }}"
+      RABBITMQ_USER: "{{ rabbitmq_user }}"
+      RABBITMQ_PASSWORD: "{{ rabbitmq_password }}"
+      RABBITMQ_HOST: "{{ rabbitmq_host }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port }}"
+      RABBITMQ_VHOST: "{{ rabbitmq_vhost }}"
+
+  recommender_task:
+    image: recommender_task:latest
+    container_name: recommender_task
+    volumes:
+      - ../../../../data/:/data/:ro
+      - ../../../../recommendersystem/:/usr/src/app:rw
+    links:
+      - "recommender_postgresql:postgresql"
+      - "recommender_rabbitmq:rabbitmq"
+    environment:
+      DATABASE: "{{ database_name }}"
+      DATABASE_USER: "{{ database_user }}"
+      DATABASE_PASSWORD: "{{ database_password }}"
+      DATABASE_HOST: "{{ database_host }}"
+      DATABASE_PORT: "{{ database_port }}"
+      SECRET_KEY: "{{ django_secret_key }}"
+      RABBITMQ_USER: "{{ rabbitmq_user }}"
+      RABBITMQ_PASSWORD: "{{ rabbitmq_password }}"
+      RABBITMQ_HOST: "{{ rabbitmq_host }}"
+      RABBITMQ_PORT: "{{ rabbitmq_port }}"
+      RABBITMQ_VHOST: "{{ rabbitmq_vhost }}"
+      BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
+      USERS: "/data/BX-Users-Cleansed-Tini.csv"
+      RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
+
+  recommender_postgresql:
+    image: postgres:9.6-alpine
+    container_name: recommender_postgresql
+    volumes:
+      - /tmp/docker/pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "{{ database_user }}"
+      POSTGRES_PASSWORD: "{{ database_password }}"
+      POSTGRES_DB: "{{ database_name }}"
+      PGPORT: "{{ database_port }}"
+      PG_DATA: "/var/lib/postgresql/data"
+
+  recommender_rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: recommender_rabbitmq
+    ports:
+      - target: "15672"
+        published: "15672"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "{{ rabbitmq_erlang_cookie }}"
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_user }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_password }}"
+      RABBITMQ_DEFAULT_VHOST: "{{ rabbitmq_vhost }}"
