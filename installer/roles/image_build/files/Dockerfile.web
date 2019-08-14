@@ -1,5 +1,6 @@
 FROM python:3.6-alpine
 WORKDIR /usr/src/app/
+ENV PATH="/usr/src/app:${PATH}"
 
 RUN apk update && apk add postgresql-dev gcc musl-dev nginx supervisor
 
