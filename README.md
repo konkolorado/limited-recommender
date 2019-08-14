@@ -13,5 +13,5 @@ Recommender Systems](https://presnick.people.si.umich.edu/papers/recsys07/p25-re
 # Requirements
 Ansible v2.8.2
 
-Pip
+pip
 docker-compose
