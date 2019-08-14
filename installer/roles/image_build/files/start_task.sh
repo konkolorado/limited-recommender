@@ -24,4 +24,4 @@ done
 
 ./manage.py init_recommendations
 
-./manage.py launch_dispatcher
+supervisord -c /supervisor_task.conf
