@@ -3,12 +3,12 @@ WORKDIR /usr/src/app/
 
 RUN apk update && apk add postgresql-dev gcc musl-dev nginx supervisor
 
-ADD requirements.txt .
-RUN pip install -r requirements.txt
+ADD requirements.txt /
+RUN pip install -r /requirements.txt
 
-COPY start_web.sh .
+COPY start_web.sh /
 COPY nginx.conf /etc/nginx/
 COPY supervisor_web.conf /
 
 COPY web .
-CMD ./start_web.sh
+CMD /start_web.sh
