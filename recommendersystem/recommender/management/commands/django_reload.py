@@ -6,8 +6,8 @@ import subprocess
 
 
 class Command(BaseCommand):
-    help = 'Gracefully reloads the gunicorn workers by sending the process a ' \
-        'HUP signal "kill -HUP <pid>"'
+    help = 'Gracefully reloads the gunicorn workers by sending the process ' \
+        'a HUP signal "kill -HUP <pid>"'
 
     def handle(self, *args, **options):
         """
