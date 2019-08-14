@@ -10,7 +10,7 @@
 
     - include_role:
         name: image_build
-      when: image_build == "True"
+      when: build_image|default(false)|bool
 
     - include_role:
         name: compose
