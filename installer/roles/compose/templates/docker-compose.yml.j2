@@ -5,8 +5,8 @@ services:
     image: recommender_web:latest
     container_name: recommender_web
     ports:
-      - target: "8050"
-        published: "8050"
+      - target: "80"
+        published: "8000"
     volumes:
       - ../../../../recommendersystem/:/usr/src/app:rw
     links:
