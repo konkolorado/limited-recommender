@@ -4,6 +4,9 @@ from recommender.models import Similarity
 import numpy
 
 from collections import defaultdict
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -18,6 +21,7 @@ class Command(BaseCommand):
 
     def __init__(self):
         self.added_counter = 0
+        self.new_counter = 0
         self.n_users = User.objects.all().count()
 
     def calc_cosine_similarity(self, a, b):
@@ -56,8 +60,9 @@ class Command(BaseCommand):
                 source=Book.objects.get(isbn=item),
                 target=Book.objects.get(isbn=similar_item_isbn),
                 similarity_score=similarities[similar_item_isbn])
+            self.added_counter += 1
             if new:
-                self.added_counter += 1
+                self.new_counter += 1
 
     def handle(self, *args, **options):
         # For each item in catalog
@@ -82,3 +87,5 @@ class Command(BaseCommand):
 
             # Store item to item similarities
             self.commit_similarities(book.isbn, sims)
+        logger.info(f"Processed {self.added_counter} similarity scores")
+        logger.info(f"Added {self.new_counter} new similarity scores")
