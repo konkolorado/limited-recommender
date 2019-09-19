@@ -22,6 +22,6 @@ done
 #TODO remove when finished
 ./manage.py test --noinput
 
-./manage.py init_recommendations
+./manage.py init_recs
 
 supervisord -c /supervisor_task.conf
