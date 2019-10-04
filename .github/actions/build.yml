@@ -1,15 +1,5 @@
 name: 'Build containers'
-description: 'Greet someone and record the time'
-inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+description: 'Builds containers'
 runs:
   using: 'docker'
   image: 'installer/roles/image_build/files/Dockerfile.web'
-  args:
-    - ${{ inputs.who-to-greet }}
