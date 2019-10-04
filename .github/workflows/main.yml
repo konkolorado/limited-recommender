@@ -5,4 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to build
     steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
     - uses: ./.github/actions/build
