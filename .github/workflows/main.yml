@@ -8,4 +8,4 @@ jobs:
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
-    - uses: docker://cloud.docker.com/repository/docker/konkolorado/ansible:0.0.1
+    - uses: ./.github/actions/build

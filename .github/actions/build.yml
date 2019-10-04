@@ -2,4 +2,4 @@ name: 'Build containers'
 description: 'Builds containers'
 runs:
   using: 'docker'
-  image: 'installer/roles/image_build/files/Dockerfile.web'
+  image: 'Dockerfile'
