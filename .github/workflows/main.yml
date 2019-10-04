@@ -1,0 +1,8 @@
+on: [push]
+
+jobs:
+  build_job:
+    runs-on: ubuntu-latest
+    name: A job to build
+    steps:
+    - uses: ./.github/actions/build.yml # Uses an action in the root directory
