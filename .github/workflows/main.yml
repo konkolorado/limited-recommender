@@ -8,7 +8,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Install build requirements
         run: |
-          pip3 install requirements/build_requirements.txt
+          pip3 install -r requirements/build_requirements.txt
       - name: Run the installer to build the containers
         run: |
           cd installer/
