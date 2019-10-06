@@ -6,5 +6,7 @@ jobs:
     name: A job to build
     steps:
     - name: Display directory context
-      run: pwd; ls
+      run: pwd
+    - name: Display directory content
+      run: ls
     - uses: ./
