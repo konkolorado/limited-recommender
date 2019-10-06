@@ -10,4 +10,4 @@ jobs:
         run: ls -la
       - name: Display action directory
         run: ls -la ./.github/actions/
-      - uses: ./.github/actions/build.yml
+      - uses: ./.github/actions/build
