@@ -8,8 +8,8 @@ jobs:
       - uses: actions/checkout@v1
       - name: Install ansible for building
         run: sudo apt-get install ansible -y
-      - name: cd into the installation directory
-        run: cd installer/
       - name: Run the installer to build the containers
-        run: ansible-playbook -i inventory install.yml
+        run: |
+          cd installer/
+          ansible-playbook -i inventory install.yml
       #- uses: ./.github/actions/build
