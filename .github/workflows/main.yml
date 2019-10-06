@@ -6,10 +6,6 @@ jobs:
     name: A job to build
     steps:
       - uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
-      - name: Display directory context
-        run: pwd
       - name: Display directory content
-        run: ls
-      - uses: ./
+        run: ls -la
+      - uses: ./.github/actions/build
