@@ -11,5 +11,6 @@ jobs:
       - name: Run the installer to build the containers
         run: |
           cd installer/
+          pip --version
           ansible-playbook -i inventory install.yml
       #- uses: ./.github/actions/build
