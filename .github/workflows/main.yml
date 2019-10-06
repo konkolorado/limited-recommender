@@ -5,8 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to build
     steps:
-    - name: Display directory context
-      run: pwd
-    - name: Display directory content
-      run: ls
-    - uses: ./
+      - uses: actions/checkout
+        with:
+          fetch-depth: 1
+      - name: Display directory context
+        run: pwd
+      - name: Display directory content
+        run: ls
+      - uses: ./
