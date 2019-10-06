@@ -9,12 +9,11 @@ jobs:
       - name: Install build server pre-requirements
         run: sudo apt-get install python3-setuptools
       - name: Install build requirements
-        run: |
-          pip3 install -r requirements/build_requirements.txt
+        run: pip3 install -r requirements/build_requirements.txt
       - name: Run the installer to build the containers
         run: |
           cd installer/
-          ansible-playbook -i inventory install.yml \
-            -e 'ansible_python_interpreter=/usr/bin/python3 
-                build_image=true'
+          ansible-playbook -i inventory install.yml -e \
+            'ansible_python_interpreter=/usr/bin/python3
+            build_image=true'
       #- uses: ./.github/actions/build
