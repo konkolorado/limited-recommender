@@ -5,4 +5,4 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to build
     steps:
-    - uses: ./.github/actions/build
+    - uses: ./
