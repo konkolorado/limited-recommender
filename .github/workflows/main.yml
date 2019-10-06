@@ -6,6 +6,6 @@ jobs:
     name: A job to build
     steps:
       - uses: actions/checkout@v1
-      - name: Display directory content
-        run: apt-get install ansible -y
+      - name: Install ansible for building
+        run: sudo apt-get install ansible -y
       - uses: ./.github/actions/build
