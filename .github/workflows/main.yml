@@ -13,6 +13,7 @@ jobs:
           pip3 list
           pip3 install -r requirements/build_requirements.txt
           pip3 list
+          ansible --version
       - name: Run the installer to build the containers
         run: |
           cd installer/
