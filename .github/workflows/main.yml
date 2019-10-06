@@ -6,12 +6,11 @@ jobs:
     name: A job to build
     steps:
       - uses: actions/checkout@v1
-      - name: Install ansible for building
-        run: sudo apt-get install ansible -y
+      - name: Install build requirements
+        run: |
+          pip3 install requirements/build_requirements.txt
       - name: Run the installer to build the containers
         run: |
           cd installer/
-          pip3 --version
-          python3 -V
           ansible-playbook -i inventory install.yml
       #- uses: ./.github/actions/build
