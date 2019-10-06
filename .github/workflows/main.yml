@@ -10,7 +10,9 @@ jobs:
         run: sudo apt-get install python3-setuptools python3-dev
       - name: Install build requirements
         run: |
+          pip3 list
           pip3 install -r requirements/build_requirements.txt
+          pip3 list
       - name: Run the installer to build the containers
         run: |
           cd installer/
