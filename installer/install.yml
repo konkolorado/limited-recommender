@@ -14,8 +14,12 @@
 
     - include_role:
         name: compose
-      when: deployment == "compose"
+      when:
+        - deployment == "compose"
+        - build_only == "false"
 
     - include_role:
         name: kubernetes
-      when: deployment == "kubernetes"
+      when:
+        - deployment == "kubernetes"
+        - build_only == "false"

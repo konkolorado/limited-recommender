@@ -1,5 +1,9 @@
 # BUILD AND DEPLOYMENT VARIABLES
 build_image: "false"
+
+# Only run the installer to build the images w/o deploying
+build_only: "false"
+
 # Deployment method is either compose or kubernetes
 # compose is for local development, kubernetes is for deployment
 deployment: "compose"
