@@ -15,5 +15,6 @@ jobs:
           cd installer/
           ansible-playbook -i inventory install.yml -e \
             'ansible_python_interpreter=/usr/bin/python3
-            build_image=true'
+            build_image=true
+            build_only=true'
       #- uses: ./.github/actions/build
