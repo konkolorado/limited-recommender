@@ -17,4 +17,8 @@ jobs:
             'ansible_python_interpreter=/usr/bin/python3
             build_image=true
             build_only=true'
+      - name: Push the built images to DockerHub
+        run: |
+          docker images
+          docker ps -a
       #- uses: ./.github/actions/build
