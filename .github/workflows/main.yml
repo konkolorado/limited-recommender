@@ -6,10 +6,10 @@ jobs:
     name: A job to build
     steps:
       - uses: actions/checkout@v1
-      - name: Install build server pre-requirements
-        run: sudo apt-get install python3-setuptools
-      - name: Install build requirements
-        run: pip3 install -r requirements/build_requirements.txt
+      - name: Install build server requirements
+        run: |
+          sudo apt-get install python3-setuptools
+          pip3 install -r requirements/build_requirements.txt
       - name: Run the installer to build the containers
         run: |
           cd installer/
