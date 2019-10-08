@@ -23,7 +23,7 @@ jobs:
           SILLY_SECRET: ${{ secrets.SILLY_SECRET }}
         run: |
           echo $SILLY_SECRET
-      #    echo $DTR_LOGIN | docker login --username konkolorado --password-stdin
+          echo $DTR_LOGIN | docker login --username konkolorado --password-stdin
       #    docker tag recommender_task:latest konkolorado/recommender_task:latest
       #    docker tag recommender_web:latest konkolorado/recommender_web:latest
       #    docker push konkolorado/recommender_task:latest
