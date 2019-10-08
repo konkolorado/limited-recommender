@@ -19,6 +19,8 @@ jobs:
             build_only=true'
       - name: Push the built images to DockerHub
         run: |
-          docker images
-          docker ps -a
+          docker tag recommender_task:latest konkolorado/recommender_task:latest
+          docker tag recommender_web:latest konkolorado/recommender_web:latest
+          docker push konkolorado/recommender_task:latest
+          docker push konkolorado/recommender_web:latest
       #- uses: ./.github/actions/build
