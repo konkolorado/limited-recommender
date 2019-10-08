@@ -18,6 +18,8 @@ jobs:
             build_image=true
             build_only=true'
       - name: Push the built images to DockerHub
+        env:
+          DTR_LOGIN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo $DTR_LOGIN | docker login --username konkolorado --password-stdin
           docker tag recommender_task:latest konkolorado/recommender_task:latest
