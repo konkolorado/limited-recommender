@@ -10,23 +10,21 @@ jobs:
         run: |
           sudo apt-get install python3-setuptools
           pip3 install -r requirements/build_requirements.txt
-      #- name: Run the installer to build the containers
-      #  run: |
-      #    cd installer/
-      #    ansible-playbook -i inventory install.yml -e \
-      #      'ansible_python_interpreter=/usr/bin/python3
-      #      build_image=true
-      #      build_only=true'
+      - name: Run the installer to build the containers
+        run: |
+          cd installer/
+          ansible-playbook -i inventory install.yml -e \
+            'ansible_python_interpreter=/usr/bin/python3
+            build_image=true
+            build_only=true'
       - name: Push the built images to DockerHub
         env:
           DTR_LOGIN: ${{ secrets.DTR_LOGIN_TOKEN }}
-          SILLY_SECRET: ${{ secrets.SILLY_SECRET }}
         run: |
-          echo $SILLY_SECRET
           echo $DTR_LOGIN | docker login --username konkolorado --password-stdin
-      #    docker tag recommender_task:latest konkolorado/recommender_task:latest
-      #    docker tag recommender_web:latest konkolorado/recommender_web:latest
-      #    docker push konkolorado/recommender_task:latest
-      #    docker push konkolorado/recommender_web:latest
-      #    docker logout
+          docker tag recommender_task:latest konkolorado/recommender_task:latest
+          docker tag recommender_web:latest konkolorado/recommender_web:latest
+          docker push konkolorado/recommender_task:latest
+          docker push konkolorado/recommender_web:latest
+          docker logout
       #- uses: ./.github/actions/build
