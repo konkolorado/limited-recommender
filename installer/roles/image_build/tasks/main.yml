@@ -14,6 +14,7 @@
 - name: Build the limited recommender system web image
   docker_image:
     name: recommender_web
+    repository: "{{ web_image_repository }}:{{ web_image_tag }}"
     source: build
     build:
       path: "{{ role_path }}/files"
@@ -25,6 +26,7 @@
 - name: Build the limited recommender system task image
   docker_image:
     name: recommender_task
+    repository: "{{ task_image_repository }}:{{ task_image_tag }}"
     source: build
     build:
       path: "{{ role_path }}/files"

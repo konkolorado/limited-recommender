@@ -1,0 +1,4 @@
+web_image_repository: konkolorado/recommender_web
+web_image_tag: latest
+task_image_repository: konkolorado/recommender_task
+task_image_tag: latest
