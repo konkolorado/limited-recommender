@@ -3,13 +3,23 @@
   hosts: all
   gather_facts: false
   force_handlers: true
-  tasks:
-    - include_role:
-        name: dev_deploy
-      when: mode == "DEVELOPMENT"
-    - include_role:
-        name: prod_deploy
-      when: mode == "PRODUCTION"
 
-  roles:
-    - { role: image_build }
+  tasks:
+    - include_vars:
+        file: config.yml
+
+    - include_role:
+        name: image_build
+      when: build_images | default(false) | bool
+
+    - include_role:
+        name: compose
+      when:
+        - deploy_app | default(false) | bool
+        - deployment == "compose"
+
+    - include_role:
+        name: kubernetes
+      when:
+        - deploy_app | default(false) | bool
+        - deployment == "kubernetes"
