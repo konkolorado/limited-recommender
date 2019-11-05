@@ -10,16 +10,16 @@
 
     - include_role:
         name: image_build
-      when: build_image|default(false)|bool
+      when: build_images | default(false) | bool
 
     - include_role:
         name: compose
       when:
+        - deploy_app | default(false) | bool
         - deployment == "compose"
-        - build_only == "false"
 
     - include_role:
         name: kubernetes
       when:
+        - deploy_app | default(false) | bool
         - deployment == "kubernetes"
-        - build_only == "false"

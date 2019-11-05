@@ -15,14 +15,12 @@ jobs:
           cd installer/
           ansible-playbook -i inventory install.yml -e \
             'ansible_python_interpreter=/usr/bin/python3
-            build_image=true
-            build_only=true'
+            build_images=true deploy_app=false'
       - name: Push the built images to DockerHub
         env:
           DTR_LOGIN: ${{ secrets.DTR_LOGIN_TOKEN }}
         run: |
           echo $DTR_LOGIN | docker login --username konkolorado --password-stdin
-          docker push konkolorado/recommender_task:latest
-          docker push konkolorado/recommender_web:latest
+          docker images --format "{{.Repository}}:{{.Tag}}" | xargs -L1 docker push
           docker logout
       #- uses: ./.github/actions/build

@@ -1,12 +1,13 @@
 # BUILD AND DEPLOYMENT VARIABLES
-build_image: "false"
-
-# Only run the installer to build the images w/o deploying
-build_only: "false"
+build_images: "true"
 
 # Deployment method is either compose or kubernetes
 # compose is for local development, kubernetes is for deployment
+deploy_app: "false"
 deployment: "compose"
+
+# Namespace to deploy into when deploying into K8s
+recommender_namespace: "recommender"
 
 # ------------------------- #
 
@@ -25,5 +26,3 @@ rabbitmq_erlang_cookie: "cookiemonster"
 rabbitmq_password: "password"
 
 django_secret_key: "supersecretkey"
-
-recommender_namespace: "recommender"
