@@ -25,6 +25,6 @@ jobs:
           DTR_USER: konkolorado
         run: |
           echo $DTR_TOKEN | docker login --username $DTR_USER --password-stdin
-          docker images --filter=reference='*/recommender_*'
+          docker images --filter=reference='*/recommender_*' \
             --format "{{.Repository}}:{{.Tag}}" | xargs -L1 docker push
           docker logout
