@@ -16,6 +16,8 @@ jobs:
           ansible-playbook -i inventory install.yml -e \
             'ansible_python_interpreter=/usr/bin/python3
             build_images=true deploy_app=false'
+      - name: Display images available
+        run: docker images
       - name: Push the built images to DockerHub
         env:
           DTR_LOGIN: ${{ secrets.DTR_LOGIN_TOKEN }}
