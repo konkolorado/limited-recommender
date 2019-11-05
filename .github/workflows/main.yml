@@ -21,6 +21,7 @@ jobs:
           DTR_LOGIN: ${{ secrets.DTR_LOGIN_TOKEN }}
         run: |
           echo $DTR_LOGIN | docker login --username konkolorado --password-stdin
-          docker images --format "{{.Repository}}:{{.Tag}}" | xargs -L1 docker push
+          docker images --filter=reference='recommender_*' \
+            --format "{{.Repository}}:{{.Tag}}" | xargs -L1 docker push
           docker logout
       #- uses: ./.github/actions/build
