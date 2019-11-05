@@ -4,7 +4,7 @@ on:
       - master
 
 jobs:
-  build_job:
+  master_merge:
     runs-on: ubuntu-latest
     name: Builds, tests, and stores images on merges into master
     steps:
