@@ -1,13 +1,17 @@
 # BUILD AND DEPLOYMENT VARIABLES
-build_images: "true"
+build_images: true
 
 # Deployment method is either compose or kubernetes
 # compose is for local development, kubernetes is for deployment
-deploy_app: "false"
+deploy_app: true
 deployment: "compose"
 
 # Namespace to deploy into when deploying into K8s
 recommender_namespace: "recommender"
+
+# Select to run tests during a compose deployment. If set, application will
+# exit after tests. Value can be unit, integration, or empty (no tests)
+test_mode: "unit"
 
 # ------------------------- #
 
