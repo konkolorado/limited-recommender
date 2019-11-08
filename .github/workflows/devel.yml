@@ -1,0 +1,49 @@
+on:
+  pull_request:
+    branches:
+      - devel
+
+jobs:
+  master_merge:
+    runs-on: ubuntu-latest
+    name: Builds and tests on pull requests for devel
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install build server requirements
+        run: |
+          sudo apt-get install python3-setuptools
+          pip3 install -r requirements/build_requirements.txt
+
+      - name: Run the installer to build and test the containers
+        run: |
+          cd installer/
+          ansible-playbook -i inventory install.yml -e \
+            'ansible_python_interpreter=/usr/bin/python3
+            build_images=true deploy_app=true
+            deployment=compose test_mode=unit'
+
+      - name: Pause until containers finish testing
+        run: |
+          while true; do
+            num_done="$(docker ps -a --filter name='recommender_*' \
+               --filter status='exited' --format '{{.Names}}'  | wc -l)"
+            if [ "$num_done" == "2" ]; then
+              exit 0
+            else
+              echo "Waiting for containers to come down"
+              sleep 5
+            fi
+          done
+
+      - name: Determine results of test stage
+        run: |
+          statuses="$(docker ps -a --filter name='recommender_*' \
+            --filter status='exited' --format '{{.Names}}' | \
+            xargs -L1  docker inspect --format='{{.State.ExitCode}}')"
+          success_count="$(echo $statuses | tr -cd '0' | wc -c)"
+          if [ "$success_count" == "2" ]; then
+              echo success; exit 0
+          else
+              echo failure; exit 1
+          fi
