@@ -23,22 +23,22 @@ jobs:
       #      build_images=true deploy_app=true
       #      deployment=compose test_mode=unit'
 
-      - name: Pause until containers finish testing
-        run: |
-          while true; do
-            num_done="$(docker ps -a --filter name='recommender_*' \
-               --filter status='exited' --format '{{.Names}}'  | wc -l)"
-            if [ "$num_done" == "2" ]; then
-              exit 0
-            else
-              echo "Waiting for containers to come down"
-              sleep 5
-            fi
-          done
+      #- name: Pause until containers finish testing
+      #  run: |
+      #    while true; do
+      #      num_done="$(docker ps -a --filter name='recommender_*' \
+      #         --filter status='exited' --format '{{.Names}}'  | wc -l)"
+      #      if [ "$num_done" == "2" ]; then
+      #        exit 0
+      #      else
+      #        echo "Waiting for containers to come down"
+      #        sleep 5
+      #      fi
+      #    done
 
       - name: Determine results of test stage
         run: |
-          statuses="$(docker ps -a --filter name='recommender_*'
+          statuses="$(docker ps -a --filter name='recommender_*' \
             --filter status='exited' --format '{{.Names}}' |
             xargs -L1  docker inspect --format='{{.State.ExitCode}}')"
           success_count="$(echo $statuses | grep '0' | wc -l)"
