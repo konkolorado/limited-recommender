@@ -38,11 +38,10 @@ jobs:
 
       - name: Determine results of test stage
         run: |
-          #docker ps -a --filter name='recommender_*' --filter status='exited' --format '{{.Names}}' | xargs -t docker inspect --format='{{.State.ExitCode}}'
           statuses="$(docker ps -a --filter name='recommender_*' \
             --filter status='exited' --format '{{.Names}}' | xargs -L1  docker inspect --format='{{.State.ExitCode}}')"
           echo $statuses
-          success_count="$(echo $statuses | grep '0' | wc -l)"
+          success_count="$(echo $statuses | tr -cd '0' | wc -c)"
           if [ "$success_count" == "2" ]; then
               echo success; exit 0
           else
