@@ -28,9 +28,10 @@ jobs:
           while true; do
             num_done="$(docker ps -a --filter name='recommender_*' \
                --filter status='exited' --format '{{.Names}}'  | wc -l)"
-            if [ "$num_done" = "2" ]; then
+            if [ "$num_done" == "2" ]; then
               exit 0
             else
+              echo "Waiting for containers to come down"
               sleep 5
             fi
           done
