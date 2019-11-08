@@ -39,13 +39,13 @@ jobs:
       - name: Determine results of test stage
         run: |
           statuses="$(docker ps -a --filter name='recommender_*' \
-            --filter status='exited' --format '{{.Names}}' | \
-            xargs -L1  docker inspect --format='{{.State.ExitCode}}')"
+            --filter status='exited' --format '{{.Names}}' \ 
+            | xargs -L1  docker inspect --format='{{.State.ExitCode}}')"
           success_count="$(echo $statuses | grep '0' | wc -l)"
           if [ "$success_count" == "2" ]; then
-              exit 0
+              echo success; exit 0
           else
-              exit 1
+              echo failure; exit 1
           fi
 
       - name: Push the built images to DockerHub
