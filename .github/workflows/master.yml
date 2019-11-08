@@ -1,7 +1,7 @@
 on:
   pull_request:
     branches:
-      - devel
+      - master
 
 jobs:
   master_merge:
@@ -21,7 +21,7 @@ jobs:
           ansible-playbook -i inventory install.yml -e \
             'ansible_python_interpreter=/usr/bin/python3
             build_images=true deploy_app=true
-            deployment=compose test_mode=unit'
+            deployment=compose test_mode=integration'
 
       - name: Pause until containers finish testing
         run: |
