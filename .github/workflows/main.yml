@@ -38,8 +38,8 @@ jobs:
 
       - name: Determine results of test stage
         run: |
-          arg=$"(which xargs)"
-          echo $arg
+          which xargs
+          
 
         #docker ps -a --filter name='recommender_*' --filter status='exited' --format '{{.Names}}' | xargs -L1  docker inspect --format='{{.State.ExitCode}}'
 
