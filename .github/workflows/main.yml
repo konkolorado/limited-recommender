@@ -26,25 +26,27 @@ jobs:
       - name: Pause until containers finish testing
         run: |
           while true; do
-            num_done="$(docker ps -a --filter name='recommender_*'
+            num_done="$(docker ps -a --filter name='recommender_*' \
                --filter status='exited' --format '{{.Names}}'  | wc -l)"
             if [ "$num_done" == "2" ]; then
               exit 0
             else
+              echo "Waiting for containers to come down"
               sleep 5
             fi
           done
 
       - name: Determine results of test stage
         run: |
-          statuses="$(docker ps -a --filter name='recommender_*'
-            --filter status='exited' --format '{{.Names}}' |
+          statuses="$(docker ps -a --filter name='recommender_*' \
+            --filter status='exited' --format '{{.Names}}' | \
             xargs -L1  docker inspect --format='{{.State.ExitCode}}')"
-          success_count="$(echo $statuses | grep '0' | wc -l)"
+          echo $statuses
+          success_count="$(echo $statuses | tr -cd '0' | wc -c)"
           if [ "$success_count" == "2" ]; then
-              exit 0
+              echo success; exit 0
           else
-              exit 1
+              echo failure; exit 1
           fi
 
       - name: Push the built images to DockerHub

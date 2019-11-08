@@ -11,7 +11,5 @@ Recommender Systems](https://presnick.people.si.umich.edu/papers/recsys07/p25-re
 
 
 # Requirements
-Ansible v2.8.2
-
-pip
-docker-compose
+Python dependencies for building are located in
+requirements/build_requirements.txt
