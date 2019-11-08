@@ -38,8 +38,7 @@ jobs:
 
       - name: Determine results of test stage
         run: |
-          docker ps -a --filter name='recommender_*' \
-          --filter status='exited' --format '{{.Names}}' | xargs -L1  docker inspect --format='{{.State.ExitCode}}'
+          docker ps -a --filter name='recommender_*' --filter status='exited' --format '{{.Names}}' | xargs -L1  docker inspect --format='{{.State.ExitCode}}'
 
         #statuses="$(docker ps -a --filter name='recommender_*' \
         #  --filter status='exited' --format '{{.Names}}' | xargs -L1  docker inspect --format='{{.State.ExitCode}}')"
