@@ -10,18 +10,22 @@ while ! nc -z $RABBITMQ_HOST $RABBITMQ_PORT; do
   sleep 1
 done
 
+case $TEST_MODE in
+    "unit")
+        echo unit tests; exit $?
+    ;;
+    "integration")
+        echo integration tests; exit $?
+    ;;
+esac
+
 # Apply any pending migrations
 ./manage.py makemigrations
 ./manage.py migrate --no-input
 
-# Preload database
+# Preload database and recommendations
 ./manage.py loadcsv -users_csv $USERS \
   -books_csv $BOOKS -ratings_csv $RATINGS
-
-# Run tests
-#TODO remove when finished
-./manage.py test --noinput
-
 ./manage.py init_recs
 
 supervisord -c /supervisor_task.conf
