@@ -56,7 +56,7 @@ class User(models.Model):
 
     def get_ratings_for_display(self):
         response = requests.get(
-            settings.DEFAULT_ORIGIN + reverse("api-rating-create"),
+            settings.DEFAULT_ORIGIN + reverse("api-rating-list"),
             params={"user_id": self.user_id})
         json_response = response.json()
         ratings = []

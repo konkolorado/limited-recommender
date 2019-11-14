@@ -35,19 +35,19 @@ class UserViewPostTestCase(TestCase):
 
     def test_api_can_create_user(self):
         self.response = self.client.post(
-            reverse('api-user-create'), self.new_user, format="json")
+            reverse('api-user-list'), self.new_user, format="json")
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
 
     def test_api_cannot_create_duplicate_user(self):
-        self.client.post(reverse('api-user-create'), self.new_user, format="json")
-        self.response = self.client.post(reverse('api-user-create'),
+        self.client.post(reverse('api-user-list'), self.new_user, format="json")
+        self.response = self.client.post(reverse('api-user-list'),
                                          self.new_user, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
     def test_api_cannot_create_user_with_invalid_field_len(self):
         self.new_user["user_id"] = "0" * 21
-        self.response = self.client.post(reverse('api-user-create'),
+        self.response = self.client.post(reverse('api-user-list'),
                                          self.new_user, format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)

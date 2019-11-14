@@ -10,7 +10,7 @@ from bookcrossing.models import Book, User, Rating
 from .filters import RatingFilterSet, UserFilterSet, BookFilterSet
 
 
-class CreateBookView(generics.ListCreateAPIView):
+class BookListView(generics.ListCreateAPIView):
     """Defines the create behavior of the Book Rest API"""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
@@ -21,14 +21,14 @@ class CreateBookView(generics.ListCreateAPIView):
         serializer.save()
 
 
-class DetailBookView(generics.RetrieveUpdateDestroyAPIView):
+class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Handles the GET PUT and DELETE requests for Books"""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     lookup_field = "pk"
 
 
-class CreateUserView(generics.ListCreateAPIView):
+class UserListView(generics.ListCreateAPIView):
     """ Defines the create behavior of the User Rest API """
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -39,14 +39,14 @@ class CreateUserView(generics.ListCreateAPIView):
         serializer.save()
 
 
-class DetailUserView(generics.RetrieveUpdateDestroyAPIView):
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Handles the GET PUT and DELETE requests for Users"""
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = "pk"
 
 
-class CreateRatingView(generics.ListCreateAPIView):
+class RatingListView(generics.ListCreateAPIView):
     """ Defines the create behavior of the Rating Rest API """
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
@@ -59,32 +59,28 @@ class CreateRatingView(generics.ListCreateAPIView):
         serializer.save()
 
 
-class DetailRatingView(generics.RetrieveUpdateDestroyAPIView):
+class RatingDetailView(generics.RetrieveUpdateDestroyAPIView):
     """ Handles the GET PUT and DELETE requests for Ratings """
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
     lookup_field = "pk"
 
 
-class ApiRootView(APIView):
+class APIRootView(APIView):
     view_name = ('REST API')
 
     def get(self, request, format=None):
-        ''' List supported API versions '''
+        '''List supported API endpoints'''
 
-        v1 = _reverse('api_v1_root_view', request=request)
+        book_api = _reverse('api-book-list', request=request)
+        user_api = _reverse('api-user-list', request=request)
+        rating_api = _reverse('api-rating-list', request=request)
+
         data = OrderedDict()
         data['description'] = ('Limited Recommender System REST API')
-        data['current_version'] = v1
-        data['available_versions'] = dict(v1=v1)
-        return Response(data)
-
-
-class ApiV1RootView(APIView):
-    def get(self, request, format=None):
-        ''' List top level resources '''
-        data = OrderedDict()
-        data['books'] = _reverse('api-book-create', request=request)
-        data['users'] = _reverse('api-user-create', request=request)
-        data['ratings'] = _reverse('api-rating-create', request=request)
+        data['endpoints'] = {
+            "books": book_api,
+            "users": user_api,
+            "ratings": rating_api,
+        }
         return Response(data)

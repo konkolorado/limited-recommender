@@ -28,7 +28,8 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('books/<pk>/', views.ItemDetailView.as_view(), name="book-detail"),
     path('users/<pk>/', views.UserDetailView.as_view(), name="user-detail"),
-    path('ratings/<pk>/', views.RatingDetailView.as_view(), name="rating-detail"),
+    path('ratings/<pk>/', views.RatingDetailView.as_view(),
+         name="rating-detail")
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
