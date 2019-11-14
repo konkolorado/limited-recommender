@@ -1,25 +1,15 @@
 from django.urls import path
-from rest_framework.urlpatterns import format_suffix_patterns
-from .views import (CreateBookView, CreateUserView, CreateRatingView,
-                    DetailBookView, DetailUserView, DetailRatingView,
-                    ApiRootView, ApiV1RootView)
+from .views import (BookListView, UserListView, RatingListView,
+                    BookDetailView, UserDetailView, RatingDetailView,
+                    APIRootView)
 
-from django.conf.urls import include
-
-v1_urls = [
-    path('', ApiV1RootView.as_view(), name="api_v1_root_view",),
-    path('books/', CreateBookView.as_view(), name="api-book-create"),
-    path('books/<pk>/', DetailBookView.as_view(), name="api-book-detail"),
-    path('users/', CreateUserView.as_view(), name="api-user-create"),
-    path('users/<pk>', DetailUserView.as_view(), name="api-user-detail"),
-    path('ratings/', CreateRatingView.as_view(), name="api-rating-create"),
-    path('ratings/<pk>', DetailRatingView.as_view(),
+urlpatterns = [
+    path('', APIRootView.as_view(), name='api-root'),
+    path('books/', BookListView.as_view(), name="api-book-list"),
+    path('books/<pk>/', BookDetailView.as_view(), name="api-book-detail"),
+    path('users/', UserListView.as_view(), name="api-user-list"),
+    path('users/<pk>', UserDetailView.as_view(), name="api-user-detail"),
+    path('ratings/', RatingListView.as_view(), name="api-rating-list"),
+    path('ratings/<pk>', RatingDetailView.as_view(),
          name="api-rating-detail"),
 ]
-
-urlpatterns = {
-    path('', ApiRootView.as_view(), name='api_root_view'),
-    path('v1/', include(v1_urls)),
-}
-
-urlpatterns = format_suffix_patterns(urlpatterns)
