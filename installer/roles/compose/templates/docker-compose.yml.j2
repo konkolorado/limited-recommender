@@ -30,7 +30,6 @@ services:
     image: recommender_task:latest
     container_name: recommender_task
     volumes:
-      - ../../../../data/:/data/:ro
       - ../../../../recommendersystem/:/usr/src/app:rw
     links:
       - "recommender_postgresql:postgresql"
@@ -48,9 +47,7 @@ services:
       RABBITMQ_HOST: "{{ rabbitmq_host }}"
       RABBITMQ_PORT: "{{ rabbitmq_port }}"
       RABBITMQ_VHOST: "{{ rabbitmq_vhost }}"
-      BOOKS: "/data/BX-Books-Cleansed-Tini.csv"
-      USERS: "/data/BX-Users-Cleansed-Tini.csv"
-      RATINGS: "/data/BX-Book-Ratings-Cleansed-Tini.csv"
+      PRELOAD_DATA: "{{ preload_data | default(omit) }}"
 
   recommender_postgresql:
     image: postgres:9.6-alpine
