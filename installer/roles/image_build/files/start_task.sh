@@ -28,7 +28,6 @@ if [ -n "$PRELOAD_DATA" ]; then
   ./manage.py loadcsv -users_csv /data/users.csv \
     -books_csv /data/items.csv -ratings_csv /data/ratings.csv
   ./manage.py init_recs
-  echo INITED
 fi
 
 supervisord -c /supervisor_task.conf
