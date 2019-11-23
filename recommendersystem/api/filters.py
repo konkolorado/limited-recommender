@@ -19,7 +19,7 @@ class RatingFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Rating
-        fields = ['isbn', 'user_id', 'rating']
+        fields = '__all__'
 
 
 class UserFilterSet(django_filters.FilterSet):
@@ -33,7 +33,7 @@ class UserFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = User
-        fields = ['user_id', 'location', 'age']
+        fields = '__all__'
 
 
 class BookFilterSet(django_filters.FilterSet):
@@ -53,7 +53,8 @@ class BookFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Book
-        fields = ['isbn', 'title', 'author', 'publication_yr', 'publisher']
+        fields = '__all__'
+        exclude = ['image_url_s', 'image_url_m', 'image_url_l']
 
 
 class SimilarityFilterSet(django_filters.FilterSet):
@@ -66,4 +67,4 @@ class SimilarityFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Similarity
-        fields = ['source', 'target', 'score']
+        fields = '__all__'
