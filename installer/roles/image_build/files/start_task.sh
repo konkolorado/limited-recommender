@@ -10,14 +10,9 @@ while ! nc -z $RABBITMQ_HOST $RABBITMQ_PORT; do
   sleep 1
 done
 
-case $TEST_MODE in
-    "unit")
-        echo unit tests; exit $?
-    ;;
-    "integration")
-        echo integration tests; exit $?
-    ;;
-esac
+if [ "$UNIT_TESTS" = true ] ; then
+    echo unit tests; exit $?
+fi
 
 # Apply any pending migrations
 ./manage.py makemigrations

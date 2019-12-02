@@ -13,7 +13,7 @@ services:
       - "recommender_postgresql:postgresql"
       - "recommender_rabbitmq:rabbitmq"
     environment:
-      TEST_MODE: "{{ test_mode | default('') }}"
+      UNIT_TESTS: "{{ unit_tests | default('false') }}"
       DATABASE: "{{ database_name }}"
       DATABASE_USER: "{{ database_user }}"
       DATABASE_PASSWORD: "{{ database_password }}"
@@ -35,7 +35,7 @@ services:
       - "recommender_postgresql:postgresql"
       - "recommender_rabbitmq:rabbitmq"
     environment:
-      TEST_MODE: "{{ test_mode | default('') }}"
+      UNIT_TESTS: "{{ unit_tests | default('false') }}"
       DATABASE: "{{ database_name }}"
       DATABASE_USER: "{{ database_user }}"
       DATABASE_PASSWORD: "{{ database_password }}"
