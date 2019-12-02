@@ -59,7 +59,7 @@ class Command(BaseCommand):
             _, new = Similarity.objects.get_or_create(
                 source=Book.objects.get(isbn=item),
                 target=Book.objects.get(isbn=similar_item_isbn),
-                similarity_score=similarities[similar_item_isbn])
+                score=similarities[similar_item_isbn])
             self.added_counter += 1
             if new:
                 self.new_counter += 1

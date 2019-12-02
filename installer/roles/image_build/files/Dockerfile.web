@@ -4,7 +4,7 @@ ENV PATH="/usr/src/app:${PATH}"
 
 RUN apk update && apk add postgresql-dev gcc musl-dev nginx supervisor
 
-ADD requirements.txt /
+COPY requirements.txt /
 RUN pip install -r /requirements.txt
 
 COPY start_web.sh /

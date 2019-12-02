@@ -9,6 +9,7 @@
     project_name: limited-recommender
     project_src: "{{ role_path }}/templates/"
     state: present
+    recreate: always
 
 - name: Remove the templated docker-compose.yml file
   file:

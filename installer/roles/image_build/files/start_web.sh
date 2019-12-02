@@ -10,14 +10,9 @@ while ! nc -z $RABBITMQ_HOST $RABBITMQ_PORT; do
   sleep 1
 done
 
-case $TEST_MODE in
-    "unit")
-        ./manage.py test api.tests --noinput; exit $?
-    ;;
-    "integration")
-        echo integration tests; exit $?
-    ;;
-esac
+if [ "$UNIT_TESTS" = true ] ; then
+    ./manage.py test api.tests --noinput; exit $?
+fi
 
 # Collect static files
 ./manage.py collectstatic --no-input --link

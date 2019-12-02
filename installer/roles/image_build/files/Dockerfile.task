@@ -4,6 +4,7 @@ USER 0
 
 RUN apk del nginx
 
+COPY items.csv ratings.csv users.csv /data/
 COPY start_task.sh /
 COPY supervisor_task.conf /
 

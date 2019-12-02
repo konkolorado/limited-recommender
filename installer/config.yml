@@ -10,8 +10,9 @@ deployment: "compose"
 recommender_namespace: "recommender"
 
 # Select to run tests during a compose deployment. If set, application will
-# exit after tests. Value can be unit, integration, or empty (no tests)
-test_mode: "unit"
+# exit after tests. Value can be true or false
+unit_tests: true
+preload_data: true
 
 # ------------------------- #
 

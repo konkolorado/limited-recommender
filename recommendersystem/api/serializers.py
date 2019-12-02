@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from bookcrossing.models import Book, User, Rating
+from recommender.models import Similarity
+
 from api.custom_fields import (HyperlinkedUserIDIdentityField,
                                HyperlinkedISBNIdentityField)
 from api.fields import UserIDSlugRelatedField, ISBNSlugRelatedField
@@ -27,8 +29,7 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to map serializer's fields with the model fields."""
         model = Book
-        fields = ("id", "title", "author", "publication_yr", "publisher",
-                  "isbn", "image_url_s", "image_url_m", "image_url_l")
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -48,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "user_id", "age", "location")
+        fields = '__all__'
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -66,11 +67,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
-
-        # Hyper linked fields read only by default
-        fields = ("id", "user_id", "isbn",  "rating",
-                  "user_id_url", "isbn_url", "created", "last_modified")
-
+        fields = '__all__'
         validators = [
             UniqueTogetherValidator(
                 queryset=Rating.objects.all(),
@@ -79,3 +76,18 @@ class RatingSerializer(serializers.ModelSerializer):
                 "User ID and ISBN pair"
             )
         ]
+
+
+class SimilaritySerializer(serializers.ModelSerializer):
+    """ Serializer to map Similarity model instances to/from JSON """
+    source = serializers.HyperlinkedRelatedField(view_name='api-book-detail',
+                                                 read_only=True,
+                                                 lookup_field="pk")
+    target = serializers.HyperlinkedRelatedField(view_name='api-book-detail',
+                                                 read_only=True,
+                                                 lookup_field="pk")
+    score = serializers.FloatField(max_value=1.0, min_value=0.0)
+
+    class Meta:
+        model = Similarity
+        fields = '__all__'

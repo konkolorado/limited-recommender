@@ -7,4 +7,4 @@ class Similarity(models.Model):
                                related_name='predictive_item')
     target = models.ForeignKey(Book, on_delete=models.PROTECT,
                                related_name='recommended_item')
-    similarity_score = models.DecimalField(max_digits=15, decimal_places=14)
+    score = models.DecimalField(max_digits=15, decimal_places=14)
