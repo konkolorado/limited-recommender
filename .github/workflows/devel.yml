@@ -21,7 +21,7 @@ jobs:
           ansible-playbook -i inventory install.yml -e \
             'ansible_python_interpreter=/usr/bin/python3
             build_images=true deploy_app=true
-            deployment=compose test_mode=unit'
+            deployment=compose unit_tests=true'
 
       - name: Pause until containers finish testing
         run: |

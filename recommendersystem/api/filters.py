@@ -1,5 +1,6 @@
 import django_filters
 from bookcrossing.models import Rating, User, Book
+from recommender.models import Similarity
 
 
 class RatingFilterSet(django_filters.FilterSet):
@@ -18,7 +19,7 @@ class RatingFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Rating
-        fields = ['isbn', 'user_id', 'rating']
+        fields = '__all__'
 
 
 class UserFilterSet(django_filters.FilterSet):
@@ -32,7 +33,7 @@ class UserFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = User
-        fields = ['user_id', 'location', 'age']
+        fields = '__all__'
 
 
 class BookFilterSet(django_filters.FilterSet):
@@ -52,4 +53,18 @@ class BookFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Book
-        fields = ['isbn', 'title', 'author', 'publication_yr', 'publisher']
+        fields = '__all__'
+        exclude = ['image_url_s', 'image_url_m', 'image_url_l']
+
+
+class SimilarityFilterSet(django_filters.FilterSet):
+    source = django_filters.CharFilter(field_name='source__isbn',
+                                       label="source")
+    target = django_filters.CharFilter(field_name='target__isbn',
+                                       label="target")
+    score = django_filters.NumberFilter(field_name='score',
+                                        label="score")
+
+    class Meta:
+        model = Similarity
+        fields = '__all__'

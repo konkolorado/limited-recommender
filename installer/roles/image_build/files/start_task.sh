@@ -10,22 +10,19 @@ while ! nc -z $RABBITMQ_HOST $RABBITMQ_PORT; do
   sleep 1
 done
 
-case $TEST_MODE in
-    "unit")
-        echo unit tests; exit $?
-    ;;
-    "integration")
-        echo integration tests; exit $?
-    ;;
-esac
+if [ "$UNIT_TESTS" = true ] ; then
+    echo unit tests; exit $?
+fi
 
 # Apply any pending migrations
 ./manage.py makemigrations
 ./manage.py migrate --no-input
 
 # Preload database and recommendations
-./manage.py loadcsv -users_csv $USERS \
-  -books_csv $BOOKS -ratings_csv $RATINGS
-./manage.py init_recs
+if [ -n "$PRELOAD_DATA" ]; then
+  ./manage.py loadcsv -users_csv /data/users.csv \
+    -books_csv /data/items.csv -ratings_csv /data/ratings.csv
+  ./manage.py init_recs
+fi
 
 supervisord -c /supervisor_task.conf
