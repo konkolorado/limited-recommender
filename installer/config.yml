@@ -11,7 +11,7 @@ recommender_namespace: "recommender"
 
 # Select to run tests during a compose deployment. If set, application will
 # exit after tests. Value can be true or false
-unit_tests: true
+unit_tests: false
 preload_data: true
 
 # ------------------------- #
