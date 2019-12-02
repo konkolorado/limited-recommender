@@ -6,6 +6,8 @@ executed on a Worker. This allows the function to be run as capacity is made
 available without freezing the UI
 """
 from collections import defaultdict
+import logging
+import math
 
 import numpy
 
@@ -13,6 +15,7 @@ from recommender.queue.publish import task
 
 from bookcrossing.models import User, Book, Rating
 from recommender.models import Similarity
+logger = logging.getLogger(__name__)
 
 
 @task("recommendations-exchange", "recommendations-queue", "new_recommendation")
@@ -31,7 +34,7 @@ def compute_similarities():
                 Record that a customer purchased I1 and I2
         For each item I2 Compute the similarity between I1 and I2
     """
-    new_similarties = 0
+    new_similarties, updated_similarities = 0, 0
     n_users = User.objects.all().count()
 
     # For each item in catalog
@@ -56,9 +59,12 @@ def compute_similarities():
         sims = compute_similarity_scores(book.isbn, item_to_item)
 
         # Store item to item similarities
-        newly_created = commit_similarities(book.isbn, sims)
-        new_similarties += newly_created
-    return new_similarties
+        created, updated = commit_similarities(book.isbn, sims)
+        new_similarties += created
+        updated_similarities += updated
+
+    logger.info(f'Created {new_similarties} new similarities')
+    logger.info(f'Updated {updated_similarities} similarities')
 
 
 def ddict_callable(n_users):
@@ -95,12 +101,22 @@ def commit_similarities(item, similarities):
     key is another object identifier and the value is the similarity
     between the two items
     """
-    newly_created = 0
+    updated = 0
+    new = 0
     for similar_item_isbn in similarities:
-        _, created = Similarity.objects.update_or_create(
+        get_obj, _ = Similarity.objects.get_or_create(
             source=Book.objects.get(isbn=item),
             target=Book.objects.get(isbn=similar_item_isbn),
             defaults={'score': similarities[similar_item_isbn]})
+
+        updated_obj, created = Similarity.objects.update_or_create(
+            source=Book.objects.get(isbn=item),
+            target=Book.objects.get(isbn=similar_item_isbn),
+            defaults={'score': similarities[similar_item_isbn]})
+
         if created:
-            newly_created += 1
-    return newly_created
+            new += 1
+        if not math.isclose(get_obj.score, updated_obj.score, rel_tol=1e-5):
+            updated += 1
+
+    return new, updated
