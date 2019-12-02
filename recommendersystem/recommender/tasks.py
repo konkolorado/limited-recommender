@@ -65,6 +65,7 @@ def compute_similarities():
 
     logger.info(f'Created {new_similarties} new similarities')
     logger.info(f'Updated {updated_similarities} similarities')
+    return True
 
 
 def ddict_callable(n_users):
