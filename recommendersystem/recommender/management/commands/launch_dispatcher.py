@@ -13,9 +13,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Full kombu documentation at:
         # https://buildmedia.readthedocs.org/media/pdf/kombu/latest/kombu.pdf
-        exchange = Exchange("recommendations-exchange", type="direct")
-        queues = [Queue(name="recommendations-queue", exchange=exchange,
-                        routing_key="new_recommendation")]
+        exchange = Exchange("recommender", type="direct")
+        queues = [Queue(name="recommender-queue", exchange=exchange,
+                        routing_key="compute-similarities")]
         with Connection(settings.BROKER_URL, heartbeat=4) as conn:
             worker = Worker(conn, queues)
             worker.run()
