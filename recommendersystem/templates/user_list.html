@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>user id</th>
+      <th>location</th>
+      <th>age</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      <tr>
+        <td>{{ user.user_id }}</td>
+        <td>{{ user.location }}</td>
+        <td>{{ user.age }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "pagination.html" %}
+
+{% endblock content %}

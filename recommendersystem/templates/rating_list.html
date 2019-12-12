@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>user</th>
+      <th>user id</th>
+      <th>item</th>
+      <th>isbn</th>
+      <th>rating</th>
+      <th>created</th>
+      <th>last modified</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rating in ratings %}
+      <tr>
+        <td>{{ rating.user_id }}</td>
+        <td>{{ rating.user_id.pk }}</td>
+        <td>{{ rating.isbn }}</td>
+        <td>{{ rating.isbn.isbn}}</td>
+        <td>{{ rating.rating }}</td>
+        <td>{{ rating.created }}</td>
+        <td>{{ rating.last_modified }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "pagination.html" %}
+
+{% endblock content %}
