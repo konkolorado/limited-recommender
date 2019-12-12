@@ -6,7 +6,7 @@ from .views import (BookListView, UserListView, RatingListView,
 
 urlpatterns = [
     path('', APIRootView.as_view(), name='api-root'),
-    path('books/', BookListView.as_view(), name="api-book-list"),
+    path('books/', BookListView.as_view(), name="api-item-list"),
     path('books/<pk>/', BookDetailView.as_view(), name="api-book-detail"),
     path('users/', UserListView.as_view(), name="api-user-list"),
     path('users/<pk>', UserDetailView.as_view(), name="api-user-detail"),

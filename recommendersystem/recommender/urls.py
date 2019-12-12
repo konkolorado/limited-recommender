@@ -25,11 +25,12 @@ from recommender import views
 urlpatterns = [
     path('', views.IndexView.as_view()),
     path('admin/', admin.site.urls),
+    # path('metrics/', something.somewhere),
     path('api/', include('api.urls')),
-    path('books/<pk>/', views.ItemDetailView.as_view(), name="book-detail"),
-    path('users/<pk>/', views.UserDetailView.as_view(), name="user-detail"),
-    path('ratings/<pk>/', views.RatingDetailView.as_view(),
-         name="rating-detail")
-
+    path('items/', views.ItemListView.as_view(), name="item-list"),
+    path('users/', views.UserListView.as_view(), name="user-list"),
+    path('ratings/', views.RatingListView.as_view(), name="rating-list"),
+    path('similarities/', views.SimilarityListView.as_view(),
+         name="similarity-list"),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

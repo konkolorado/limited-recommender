@@ -47,7 +47,7 @@ services:
       RABBITMQ_HOST: "{{ rabbitmq_host }}"
       RABBITMQ_PORT: "{{ rabbitmq_port }}"
       RABBITMQ_VHOST: "{{ rabbitmq_vhost }}"
-      PRELOAD_DATA: "{{ preload_data | default(omit) }}"
+      PRELOAD_DATA: "{{ preload_data | default('') }}"
 
   recommender_postgresql:
     image: postgres:9.6-alpine

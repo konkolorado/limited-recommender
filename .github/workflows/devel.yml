@@ -31,7 +31,7 @@ jobs:
             if [ "$num_done" == "2" ]; then
               exit 0
             else
-              echo "Waiting for containers to come down"
+              echo "Waiting for containers to finish unit tests"
               sleep 5
             fi
           done

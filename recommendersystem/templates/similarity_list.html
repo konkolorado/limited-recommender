@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>source</th>
+      <th>source isbn</th>
+      <th>target</th>
+      <th>target isbn</th>
+      <th>score</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for similarity in similarities %}
+      <tr>
+        <td>{{ similarity.source }}</td>
+        <td>{{ similarity.source.isbn }}</td>
+        <td>{{ similarity.target }}</td>
+        <td>{{ similarity.target.isbn }}</td>
+        <td>{{ similarity.score }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "pagination.html" %}
+
+{% endblock content %}

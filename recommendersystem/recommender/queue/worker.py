@@ -1,7 +1,6 @@
 from kombu.mixins import ConsumerMixin
 
 import importlib
-import sys
 
 
 class Worker(ConsumerMixin):
@@ -24,9 +23,8 @@ class Worker(ConsumerMixin):
         kwargs = body.get('kwargs', {})
 
         result = callable(*args, **kwargs)
-        print('Got message: {0}, with result {1}'.format(body, result))
-        sys.stdout.flush()
-        message.ack()
+        if result:
+            message.ack()
 
     def return_callable(self, body):
         module, task = body['function'].rsplit('.', 1)
