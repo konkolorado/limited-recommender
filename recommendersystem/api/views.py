@@ -92,7 +92,7 @@ class APIRootView(APIView):
     def get(self, request, format=None):
         '''List supported API endpoints'''
 
-        book_api = _reverse('api-book-list', request=request)
+        book_api = _reverse('api-item-list', request=request)
         user_api = _reverse('api-user-list', request=request)
         rating_api = _reverse('api-rating-list', request=request)
         similarity_api = _reverse('api-similarity-list', request=request)
