@@ -7,6 +7,7 @@ from recommender.models import Similarity
 from api.custom_fields import (HyperlinkedUserIDIdentityField,
                                HyperlinkedISBNIdentityField)
 from api.fields import UserIDSlugRelatedField, ISBNSlugRelatedField
+from api.validators import validate_all_digits
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -17,12 +18,13 @@ class BookSerializer(serializers.ModelSerializer):
                                      UniqueValidator(
                                          queryset=Book.objects.all(),
                                          message="Cannot create Book with "
-                                         "duplicate ISBN"
-                                     )
+                                         "duplicate ISBN"),
+                                     validate_all_digits,
                                  ])
     title = serializers.CharField(trim_whitespace=True, max_length=200)
     author = serializers.CharField(trim_whitespace=True, max_length=100)
-    publication_yr = serializers.CharField(trim_whitespace=True, max_length=10)
+    publication_yr = serializers.CharField(trim_whitespace=True, max_length=10,
+                                           validators=[validate_all_digits])
     publisher = serializers.CharField(trim_whitespace=True, max_length=50)
     id = serializers.IntegerField(source="pk", read_only=True)
 
@@ -41,10 +43,12 @@ class UserSerializer(serializers.ModelSerializer):
                                             queryset=User.objects.all(),
                                             message="Cannot create User with "
                                             "duplicate user_id"
-                                        )
+                                        ),
+                                        validate_all_digits,
                                     ])
     location = serializers.CharField(trim_whitespace=True, max_length=50)
-    age = serializers.CharField(trim_whitespace=True, max_length=3)
+    age = serializers.CharField(trim_whitespace=True, max_length=3,
+                                validators=[validate_all_digits])
     id = serializers.IntegerField(source="pk", read_only=True)
 
     class Meta:
