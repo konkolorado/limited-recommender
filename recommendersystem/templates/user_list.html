@@ -23,7 +23,9 @@
 
 {% include "pagination.html" %}
 
-{{ form }}
-<button onclick="window.location.href = '/api/users';">Add user</button>
+<form action="{% url 'api-user-list' %}" method="post">
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
 
 {% endblock content %}
