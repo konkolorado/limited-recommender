@@ -29,4 +29,9 @@
 
 {% include "pagination.html" %}
 
+<form action="{% url 'api-item-list' %}" method="post">
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+
 {% endblock content %}

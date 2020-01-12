@@ -18,12 +18,12 @@ from recommender.models import Similarity
 logger = logging.getLogger(__name__)
 
 
-@task("recommendations-exchange", "recommendations-queue", "new_recommendation")
+@task("recommender-queue", "compute-similarities")
 def empty_func(num1, num2):
     return num1 + num2
 
 
-@task("recommendations-exchange", "recommendations-queue", "new_recommendation")
+@task("recommender-queue", "compute-similarities")
 def compute_similarities():
     """
     Creates or updates the item-similarity matrix

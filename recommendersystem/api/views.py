@@ -4,12 +4,22 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.reverse import _reverse
+from django.views import View
+from django.http import HttpResponse
 
-from .serializers import BookSerializer, UserSerializer, RatingSerializer,  SimilaritySerializer
-from .filters import RatingFilterSet, UserFilterSet, BookFilterSet, SimilarityFilterSet
+
+from .serializers import (BookSerializer,
+                          UserSerializer,
+                          RatingSerializer,
+                          SimilaritySerializer)
+from .filters import (RatingFilterSet,
+                      UserFilterSet,
+                      BookFilterSet,
+                      SimilarityFilterSet)
 
 from bookcrossing.models import Book, User, Rating
 from recommender.models import Similarity
+from recommender.tasks import compute_similarities
 
 
 class BookListView(generics.ListCreateAPIView):
@@ -84,6 +94,16 @@ class SimilarityDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Similarity.objects.all()
     serializer_class = SimilaritySerializer
     lookup_field = "pk"
+
+
+class SimilarityRecompute(View):
+    """
+    Schedules a task to recompute all similarities
+    """
+
+    def post(self, request, *args, **kwargs):
+        compute_similarities.publish()
+        return HttpResponse(status=204)
 
 
 class APIRootView(APIView):

@@ -31,4 +31,9 @@
 
 {% include "pagination.html" %}
 
+<form action="{% url 'api-rating-list' %}" method="post">
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
 {% endblock content %}

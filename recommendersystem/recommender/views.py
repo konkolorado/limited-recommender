@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.views import View
+from django.views.generic.edit import FormMixin
 from django.views.generic import ListView
 from django.urls import reverse
 
 from bookcrossing.models import Book, User, Rating
+from bookcrossing.forms import BookForm, UserForm, RatingForm
 from recommender.models import Similarity
 
 PAGE_ITEMS = 10
@@ -22,8 +24,9 @@ class IndexView(View):
                                'similarity_url': reverse('similarity-list')})
 
 
-class UserListView(ListView):
+class UserListView(FormMixin, ListView):
     model = User
+    form_class = UserForm
     paginate_by = PAGE_ITEMS
     # Default: object_list
     context_object_name = 'users'
@@ -31,15 +34,17 @@ class UserListView(ListView):
     template_name = 'user_list.html'
 
 
-class ItemListView(ListView):
+class ItemListView(FormMixin, ListView):
     model = Book
+    form_class = BookForm
     paginate_by = PAGE_ITEMS
     context_object_name = 'items'
     template_name = 'item_list.html'
 
 
-class RatingListView(ListView):
+class RatingListView(FormMixin, ListView):
     model = Rating
+    form_class = RatingForm
     paginate_by = PAGE_ITEMS
     context_object_name = 'ratings'
     template_name = 'rating_list.html'

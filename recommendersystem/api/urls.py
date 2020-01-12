@@ -1,7 +1,13 @@
 from django.urls import path
-from .views import (BookListView, UserListView, RatingListView,
-                    SimilarityListView, SimilarityDetailView,
-                    BookDetailView, UserDetailView, RatingDetailView,
+from .views import (BookListView,
+                    UserListView,
+                    RatingListView,
+                    SimilarityListView,
+                    SimilarityDetailView,
+                    BookDetailView,
+                    UserDetailView,
+                    RatingDetailView,
+                    SimilarityRecompute,
                     APIRootView)
 
 urlpatterns = [
@@ -15,6 +21,8 @@ urlpatterns = [
          name="api-rating-detail"),
     path('similarities/', SimilarityListView.as_view(),
          name='api-similarity-list'),
-    path('similarities/<pk>', SimilarityDetailView.as_view(),
+    path('similarities/<int:pk>', SimilarityDetailView.as_view(),
          name='api-similarity-detail'),
+    path('similarities/recompute', SimilarityRecompute.as_view(),
+         name='api-similarity-recompute'),
 ]

@@ -14,12 +14,12 @@ def serialize_task(f):
 
 
 class task(object):
-    def __init__(self, exchange, queue, routing_key):
+    def __init__(self, queue, routing_key):
         """
         The decorated function is not passed to __init__ if there are
         decorator arguments. Arguments must get handled in __call__
         """
-        self.exchange = exchange
+        self.exchange = "recommender"
         self.queue = queue
         self.routing_key = routing_key
 
