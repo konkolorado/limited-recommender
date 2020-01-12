@@ -26,7 +26,10 @@
 </table>
 
 {% include "pagination.html" %}
-#TODO
-<button onclick="window.location.href = '/api/items';">Re-compute similarities</button>
+
+<form name="recompute similarties" action="{% url 'api-similarity-recompute' %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Re-compute similarities">
+</form>
 
 {% endblock content %}
